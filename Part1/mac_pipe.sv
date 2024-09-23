@@ -16,6 +16,7 @@ module mac_pipe #(
     logic signed [2*INW-1:0]    mult_out;
     logic signed [2*INW-1:0]    pipe_line_rg_out;
     logic signed [OUTW-1:0]     add_out;
+    logic signed enable_out_register;
 
     always_comb 
     begin
@@ -25,9 +26,11 @@ module mac_pipe #(
     always_ff @(posedge clk) begin
         if(reset) begin
             pipe_line_rg_out <= 0;
+            enable_out_register <= 0;
         end
         else begin
             pipe_line_rg_out <= mult_out;
+            enable_out_register <= valid_input;
         end
     end
 
@@ -54,7 +57,7 @@ module mac_pipe #(
             out <= 0;
             data_ready <= 0;
         end
-        else if(valid_input) begin
+        else if(enable_out_register) begin
             out <= add_out;
         end
         
