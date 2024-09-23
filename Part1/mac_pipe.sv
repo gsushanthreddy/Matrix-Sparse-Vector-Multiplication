@@ -55,7 +55,7 @@ module mac_pipe #(
     begin 
         if(reset || clear_acc) begin
             out <= 0;
-            data_ready <= 0;
+            enable_out_register <= 0;
         end
         else if(enable_out_register) begin
             out <= add_out;
