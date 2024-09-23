@@ -1,0 +1,50 @@
+module mac #(
+    parameter INW = 16,
+    parameter OUTW = 48,
+    localparam MINVAL = (64'd1<<(OUTW-1)),
+    localparam MAXVAL = (64'd1<<(OUTW-1))-1
+)(
+    input signed [INW-1:0]          in0,
+    input signed [INW-1:0]          in1,
+    input                           valid_input,
+    input                           clear_acc,
+    input                           reset,
+    input                           clk,
+    output logic signed [OUTW-1:0]  out
+);
+
+    logic signed [2*INW-1:0]    mult_out;
+    logic signed [OUTW-1:0]     add_out;
+
+    always_comb 
+    begin
+        mult_out    = in0 * in1; 
+        add_out     = mult_out + out;
+
+        // Handling Saturation 
+        /* If both the inputs to the adder are positive(signed bit=0) and the result add_out is negative(signed bit=1), then overflow occured. 
+        If both the inputs of the adder are negative and add_out is positive, then also overflow occured. 
+        */
+
+        if(out[OUTW-1]==1 && mult_out[2*INW-1]==1 && add_out[OUTW-1]==0) begin 
+            add_out = -MINVAL;
+        end
+        else if(out[OUTW-1]==0 && mult_out[2*INW-1]==0 && add_out[OUTW-1]==1) begin
+            add_out = MAXVAL;
+        end
+        else begin
+            add_out = $signed(add_out);
+        end
+    end
+
+    always_ff @(posedge clk) 
+    begin 
+        if(reset || clear_acc) begin
+            out <= 0;
+        end
+        else if(valid_input) begin
+            out <= add_out;
+        end
+    end
+
+endmodule

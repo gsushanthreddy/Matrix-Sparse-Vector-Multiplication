@@ -1,0 +1,37 @@
+# ERROR: No extended dataflow license exists
+# vsim testbench_mac_pipe 
+# Start time: 18:29:41 on Sep 20,2024
+# Loading sv_std.std
+# Loading work.testbench_mac_pipe
+# Loading work.mac_pipe
+add wave -position insertpoint  \
+sim:/testbench_mac_pipe/mac_unit_inst/in0 \
+sim:/testbench_mac_pipe/mac_unit_inst/in1 \
+sim:/testbench_mac_pipe/mac_unit_inst/valid_input \
+sim:/testbench_mac_pipe/mac_unit_inst/clear_acc \
+sim:/testbench_mac_pipe/mac_unit_inst/reset \
+sim:/testbench_mac_pipe/mac_unit_inst/clk \
+sim:/testbench_mac_pipe/mac_unit_inst/out
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: susha  Hostname: SUSHANTH-LEGION  ProcessID: 67664
+#           Attempting to use alternate WLF file "./wlft7jre5e".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlft7jre5e
+run -all
+# ** Note: $stop    : testbench_mac_pipe.sv(64)
+#    Time: 54 ns  Iteration: 0  Instance: /testbench_mac_pipe
+# Break in Module testbench_mac_pipe at testbench_mac_pipe.sv line 64
+add wave -position insertpoint  \
+sim:/testbench_mac_pipe/mac_unit_inst/data_ready
+restart -f
+run -all
+# ** Note: $stop    : testbench_mac_pipe.sv(64)
+#    Time: 54 ns  Iteration: 0  Instance: /testbench_mac_pipe
+# Break in Module testbench_mac_pipe at testbench_mac_pipe.sv line 64
+add wave -position insertpoint  \
+sim:/testbench_mac_pipe/mac_unit_inst/pipe_line_rg_out
+restart -f
+run -all
+# ** Note: $stop    : testbench_mac_pipe.sv(64)
+#    Time: 54 ns  Iteration: 0  Instance: /testbench_mac_pipe
+# Break in Module testbench_mac_pipe at testbench_mac_pipe.sv line 64
