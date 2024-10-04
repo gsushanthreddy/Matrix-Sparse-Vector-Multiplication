@@ -109,7 +109,7 @@ logic [LOGDEPTH-1 : 0] rd_addr;
 
 // control logic FOR AXIS_TVALID:
 always_comb begin
-    if(capacity != 0)
+    if(capacity != DEPTH)
         AXIS_TVALID = 1;
     else 
         AXIS_TVALID = 0;
