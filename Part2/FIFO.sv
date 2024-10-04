@@ -84,3 +84,62 @@ always_ff @(posedge clk) begin
         capacity <= capacity - 1;
 end
 endmodule
+
+module fifo_out #(
+    parameter OUTW = 48,
+    parameter DEPTH = 17,
+    localparam LOGDEPTH = $clog2(DEPTH)
+ )(
+    input clk, 
+    input reset,
+    input [OUTW-1:0] data_in,
+    input wr_en,
+    output logic [$clog2(DEPTH+1)-1:0] capacity,
+    output logic [OUTW-1:0] AXIS_TDATA,
+    output logic AXIS_TVALID,
+    input AXIS_TREADY 
+ );
+
+// internal logics fot head block
+logic [LOGDEPTH-1 : 0] wr_addr;
+
+// interal logics for tail block
+logic rd_en;
+logic [LOGDEPTH-1 : 0] rd_addr;
+
+// intantiating Head block:
+head_block #(.DEPTH(DEPTH)) head_block_inst (
+    .clk(clk),
+    .reset(reset),
+    .wr_en(wr_en),
+    .wr_addr(wr_addr)
+);
+
+ // instantiating Tail block:
+ tail_block #(.DEPTH(DEPTH)) tail_block_inst (
+    .clk(clk),
+    .reset(reset),
+    .rd_en(rd_en),
+    .rd_addr(rd_addr)
+ );
+
+ // instantiating capacity block:
+ capacity_block #(.DEPTH(DEPTH)) capacity_block_inst(
+    .clk(clk),
+    .reset(reset),
+    .rd_en(rd_en),
+    .wr_en(wr_en),
+    .capacity(capacity)
+ );
+
+ // Instatiating Memory block:
+ memory_dual_port #(.WIDTH(OUTW),.SIZE(DEPTH)) memory_dual_port_inst (
+    .data_in(data_in),
+    .data_out(AXIS_TDATA),// this will be wrong check before finalising
+    .write_addr(wr_addr),
+    .read_addr(read_addr),
+    .clk(clk),
+    .wr_en(wr_en)
+);
+
+endmodule
