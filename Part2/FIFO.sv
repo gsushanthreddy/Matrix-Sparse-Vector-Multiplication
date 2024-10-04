@@ -107,6 +107,22 @@ logic [LOGDEPTH-1 : 0] wr_addr;
 logic rd_en;
 logic [LOGDEPTH-1 : 0] rd_addr;
 
+// control logic FOR AXIS_TVALID:
+always_comb begin
+    if(capacity != 0)
+        AXIS_TVALID = 1;
+    else 
+        AXIS_TVALID = 0;
+end
+
+// control logic for read enable signal:
+always_comb begin
+    if( AXIS_TREADY && AXIS_TVALID)
+        rd_en = 1;
+    else 
+        rd_en = 0;
+end
+
 // intantiating Head block:
 head_block #(.DEPTH(DEPTH)) head_block_inst (
     .clk(clk),
