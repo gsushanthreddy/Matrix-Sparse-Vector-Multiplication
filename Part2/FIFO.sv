@@ -1,6 +1,6 @@
 module memory_dual_port #(
-    parameter WIDTH=16,
-    parameter SIZE=64,
+    parameter WIDTH=48,
+    parameter SIZE=17,
     localparam LOGSIZE=$clog2(SIZE)
  )(
     input [WIDTH-1:0] data_in,
@@ -22,52 +22,57 @@ module memory_dual_port #(
 endmodule
 
 module head_block #(
-    parameter DEPTH=64,
+    parameter DEPTH=17,
     localparam LOGDEPTH=$clog2(DEPTH)
 )(
     input clk,
     input reset,
     input wr_en,
-    output [LOGDEPTH-1:0] write_addr
+    output logic [LOGDEPTH-1:0] write_addr
 );
 
 always_ff @(posedge clk) begin
-    if (reset == 1)
-        wr_addr <= 0;
-    else if (wr_en == 1)
-        if(wr_addr == DEPTH-1)
-            write_addr <=0
-        else
-            wr_addr <= wr_addr+1;
+    if (reset == 1) begin
+        write_addr <= 0;
+    end
+    else if (wr_en == 1) begin
+        if(write_addr == DEPTH-1) begin
+            write_addr <=0;
+        end
+        else begin
+            write_addr <= write_addr+1;
+        end
+    end
 end   
 endmodule
 
 module tail_block #(
-    parameter DEPTH =64,
+    parameter DEPTH =17,
     localparam LOGDEPTH=$clog2(DEPTH)
 )(
     input clk,
     input reset,
     input rd_en,
-    output [LOGDEPTH-1:0] read_addr
+    output logic [LOGDEPTH-1:0] read_addr
 );
 
 //logic [LOGDEPTH-1 :0] tail;
 
 always_ff @(posedge clk) begin
-    if (reset)
-        rd_addr <= 0;
+    if (reset) begin
+        read_addr <= 0;
         //tail <= 0;
+    end
     else if (rd_en == 0) begin
         //rd_addr <= tail;
-        rd_addr <= rd_addr;
+        read_addr <= read_addr;
     end
     else if (rd_en == 1) begin
-        if (rd_addr == DEPTH-1) begin
-            rd_addr <= 0;
+        if (read_addr == DEPTH-1) begin
+            read_addr <= 0;
         end
         else begin
-            rd_addr <= rd_addr + 1;
+            read_addr <= read_addr + 1;
             /*rd_addr <= tail+1;
             tail <= tail + 1;*/
         end
@@ -76,24 +81,25 @@ end
 endmodule
 
 module capacity_block #(
-    parameter DEPTH = 64
+    parameter DEPTH = 17
 ) (
     input clk,
     input reset,
     input rd_en,
     input wr_en,
-    output [($clog2(DEPTH-1))-1:0] capacity
+    output logic [($clog2(DEPTH-1))-1:0] capacity
 );
 
 always_ff @(posedge clk) begin
-    if (reset)
+    if (reset) begin
         capacity <= DEPTH;
-
-    else if (~wr_en && rd_en)
+    end
+    else if (~wr_en && rd_en) begin
         capacity <= capacity + 1;
-
-    else if (wr_en && ~rd_en)
+    end 
+    else if (wr_en && ~rd_en) begin
         capacity <= capacity - 1;
+    end
 end
 endmodule
 
@@ -140,7 +146,7 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .clk(clk),
     .reset(reset),
     .wr_en(wr_en),
-    .wr_addr(wr_addr)
+    .write_addr(wr_addr)
 );
 
  // instantiating Tail block:
@@ -148,7 +154,7 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .clk(clk),
     .reset(reset),
     .rd_en(rd_en),
-    .rd_addr(rd_addr)
+    .read_addr(rd_addr)
  );
 
  // instantiating capacity block:
@@ -165,7 +171,7 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .data_in(data_in),
     .data_out(AXIS_TDATA),// this will be wrong check before finalising
     .write_addr(wr_addr),
-    .read_addr(read_addr),
+    .read_addr(rd_addr),
     .clk(clk),
     .wr_en(wr_en)
 );
