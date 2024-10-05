@@ -88,7 +88,7 @@ module capacity_block #(
     input reset,
     input rd_en,
     input wr_en,
-    output logic [($clog2(DEPTH-1))-1:0] capacity
+    output logic [($clog2(DEPTH+1))-1:0] capacity
 );
 
 always_ff @(posedge clk) begin
