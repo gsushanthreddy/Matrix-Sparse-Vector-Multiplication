@@ -38,7 +38,7 @@ always_ff @(posedge clk) begin
         if(wr_addr == DEPTH-1)
             write_addr <=0
         else
-        wr_addr <= wr_addr+1;
+            wr_addr <= wr_addr+1;
 end   
 endmodule
 
@@ -52,14 +52,26 @@ module tail_block #(
     output [LOGDEPTH-1:0] read_addr
 );
 
+//logic [LOGDEPTH-1 :0] tail;
+
 always_ff @(posedge clk) begin
-    if (rd_en == 0)
-        rd_addr <= tail;
-    else
-        if (rd_addr == DEPTH-1)
+    if (reset)
+        rd_addr <= 0;
+        //tail <= 0;
+    else if (rd_en == 0) begin
+        //rd_addr <= tail;
+        rd_addr <= rd_addr;
+    end
+    else if (rd_en == 1) begin
+        if (rd_addr == DEPTH-1) begin
             rd_addr <= 0;
-        else
-            rd_addr <= tail+1;
+        end
+        else begin
+            rd_addr <= rd_addr + 1;
+            /*rd_addr <= tail+1;
+            tail <= tail + 1;*/
+        end
+    end
 end
 endmodule
 
