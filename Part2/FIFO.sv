@@ -15,8 +15,9 @@ module memory_dual_port #(
     data_out <= mem[read_addr];
     if (wr_en) begin 
         mem[write_addr] <= data_in; 
-        if (read_addr == write_addr)
+        if (read_addr == write_addr) begin
             data_out <= data_in;
+        end
     end
  end
 endmodule
@@ -127,18 +128,22 @@ logic [LOGDEPTH-1 : 0] rd_addr;
 
 // control logic FOR AXIS_TVALID:
 always_comb begin
-    if(capacity != DEPTH)
+    if(capacity != DEPTH) begin
         AXIS_TVALID = 1;
-    else 
+    end
+    else begin
         AXIS_TVALID = 0;
+    end
 end
 
 // control logic for read enable signal:
 always_comb begin
-    if( AXIS_TREADY && AXIS_TVALID)
+    if( AXIS_TREADY && AXIS_TVALID) begin
         rd_en = 1;
-    else 
+    end
+    else begin 
         rd_en = 0;
+    end
 end
 
 // intantiating Head block:
