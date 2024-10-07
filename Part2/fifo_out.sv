@@ -1,7 +1,7 @@
 module memory_dual_port #(
     parameter WIDTH=48,
     parameter SIZE=17,
-    localparam LOGSIZE=$clog2(SIZE)
+    localparam LOGSIZE= $clog2(SIZE)
  )(
     input [WIDTH-1:0] data_in,
     output logic [WIDTH-1:0] data_out,
@@ -56,27 +56,31 @@ module tail_block #(
     output logic [LOGDEPTH-1:0] read_addr
 );
 
-//logic [LOGDEPTH-1 :0] tail;
+logic [LOGDEPTH-1 :0] tail;
 
 always_ff @(posedge clk) begin
     if (reset) begin
-        read_addr <= 0;
-        //tail <= 0;
+        tail <= 0;
     end
-    else if (rd_en == 0) begin
-        //rd_addr <= tail;
-        read_addr <= read_addr;
-    end
+
     else if (rd_en == 1) begin
-        if (read_addr == DEPTH-1) begin
-            read_addr <= 0;
+        if (tail == DEPTH-1) begin
+            tail <= 0;
         end
         else begin
-            read_addr <= read_addr + 1;
-            /*rd_addr <= tail+1;
-            tail <= tail + 1;*/
+            tail <= tail + 1;
         end
     end
+end
+
+always_comb begin
+    if (rd_en == 0) begin
+        read_addr = tail;
+    end
+    
+    else begin
+        read_addr = tail+1;
+    end   
 end
 endmodule
 
