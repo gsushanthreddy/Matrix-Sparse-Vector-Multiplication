@@ -1,6 +1,6 @@
 module memory_dual_port #(
     parameter WIDTH=48,
-    parameter SIZE=17,
+    parameter SIZE=16,
     localparam LOGSIZE= $clog2(SIZE)
  )(
     input [WIDTH-1:0] data_in,
@@ -36,12 +36,14 @@ always_ff @(posedge clk) begin
     if (reset == 1) begin
         write_addr <= 0;
     end
-    else if (wr_en == 1) begin
-        if(write_addr == DEPTH-1) begin
-            write_addr <=0;
-        end
-        else begin
-            write_addr <= write_addr+1;
+    else begin 
+        if (wr_en == 1) begin
+            if(write_addr == DEPTH-1) begin
+                write_addr <=0;
+            end
+            else begin
+                write_addr <= write_addr+1;
+            end
         end
     end
 end   
@@ -63,13 +65,14 @@ always_ff @(posedge clk) begin
     if (reset) begin
         tail <= 0;
     end
-
-    else if (rd_en == 1) begin
-        if (tail == DEPTH-1) begin
-            tail <= 0;
-        end
-        else begin
-            tail <= tail + 1;
+    else begin
+        if (rd_en == 1) begin
+            if (tail == DEPTH-1) begin
+                tail <= 0;
+            end
+            else begin
+                tail <= tail + 1; 
+            end
         end
     end
 end
@@ -80,7 +83,12 @@ always_comb begin
     end
     
     else begin
-        read_addr = tail+1;
+        if(tail == DEPTH-1) begin
+            read_addr = 0;
+        end
+        else begin
+            read_addr = tail + 1;
+        end
     end   
 end
 endmodule
@@ -99,11 +107,16 @@ always_ff @(posedge clk) begin
     if (reset) begin
         capacity <= DEPTH;
     end
-    else if (~wr_en && rd_en) begin
-        capacity <= capacity + 1;
-    end 
-    else if (wr_en && ~rd_en) begin
-        capacity <= capacity - 1;
+    else begin
+        if (~wr_en && rd_en) begin
+            capacity <= capacity + 1;
+        end 
+        else if (wr_en && ~rd_en) begin
+            capacity <= capacity - 1;
+        end
+        else begin
+            capacity <= capacity;
+        end
     end
 end
 endmodule
@@ -142,7 +155,7 @@ end
 
 // control logic for read enable signal:
 always_comb begin
-    if( AXIS_TREADY && AXIS_TVALID) begin
+    if(AXIS_TREADY && AXIS_TVALID) begin
         rd_en = 1;
     end
     else begin 
