@@ -22,9 +22,13 @@ module input_mems #(
 );  
     logic [$clog2(MAXK+1)-1:0] TUSER_K;
     logic new_A;
+    logic [A_ADDR_BITS-1:0] A_write_ADDR;
+    logic [B_ADDR_BITS-1:0] B_write_ADDR;
+    logic wr_en_a;
+    logic wr_en_b;
     // How to instantiate memory modules
-    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // wr_en signal to write values in memory? 
-    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); 
+    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, wr_en_a); // wr_en signal to write values in memory? 
+    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, wr_en_b); 
     
     assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; // K value from AXI input stream protocol 
     assign new_A = AXIS_TUSER[0];
@@ -39,7 +43,10 @@ module input_mems #(
         end
         else begin
             if(AXIS_TVALID && AXIS_TREADY) begin
-                
+                if(new_A) begin
+                    a_addr <= 0;
+                    memo
+                end
             end
         end
     end
