@@ -23,26 +23,69 @@ module input_mems #(
     logic [$clog2(MAXK+1)-1:0] TUSER_K;
     logic new_A;
     // How to instantiate memory modules
-    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // wr_en signal to write values in memory? 
-    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); 
+    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // akarsh
+    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); // akarsh
     
-    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; // K value from AXI input stream protocol 
+    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
     assign new_A = AXIS_TUSER[0];
 
-    always_ff @(posedge clk) begin
-        if(reset) begin
-            AXIS_TREADY <= 0;
-            matrices_loaded <= 0;
-            K <= 0;
-            A_data <= 0;
-            B_data <= 0;
+    enum {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
+
+    always_comb begin
+        if(state==start) begin
+            if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
+                if(new_A==1) begin
+                    next_state = load_a_and_b;
+                end 
+                else begin
+                    next_state = load_b;
+                end 
+            end
+            else begin
+                next_state = start;
+            end         
         end
-        else begin
-            if(AXIS_TVALID && AXIS_TREADY) begin
-                
+        else if(state==load_a_and_b) begin
+            if(matrices_loaded==1) begin
+                next_state = read;
+            end
+            else begin
+                next_state = load_a_and_b;
+            end
+        end
+        else if(state==load_b) begin
+            if(matrices_loaded==1) begin
+                next_state = read;
+            end
+            else begin
+                next_state = load_b;
+            end
+        end
+        else if(state==read) begin
+            if(compute_finished==1) begin
+               next_state = start;
+            end
+            else begin
+               next_state = read;
             end
         end
     end
+
+    always_ff @(posedge clk) begin
+        if(reset) begin
+            state <= start;
+        end
+        else begin
+            state <= next_state;
+        end
+    end
+
+    /* Next steps :- 
+        1. Logic for load_a_and_b, load_b and read states
+        2. Handling wr_en_a and wr_en_b signals 
+        3. Storing K and new_A values 
+        4. Read Addresses computation for mem_a and mem_b  
+    */
 endmodule
 
 module memory #(

@@ -1,0 +1,55 @@
+								Status Report for Project Part-2  
+
+Members of the Team:- 
+
+1. Sushanth Reddy Gurram - 115668498
+2. Sai Akarsh Gokavarapu - 115910975 
+
+Project Part-2 :- 
+
+* Part-2 of the project included implementation of "Output FIFO". 
+* Different scenarios under which the implementation was tested using QuestaSim Simulator: 
+	- OUTW = 48, DEPTH = 17, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 17, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 48, DEPTH = 17, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 17, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 48, DEPTH = 17, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+	- OUTW = 48, DEPTH = 34, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 34, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 48, DEPTH = 34, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 34, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 48, DEPTH = 34, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+	- OUTW = 48, DEPTH = 8, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 8, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 48, DEPTH = 8, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 48, DEPTH = 8, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 48, DEPTH = 8, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+	- OUTW = 24, DEPTH = 17, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 17, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 24, DEPTH = 17, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 17, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 24, DEPTH = 17, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+	- OUTW = 24, DEPTH = 34, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 34, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 24, DEPTH = 34, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 34, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 24, DEPTH = 34, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+	- OUTW = 24, DEPTH = 8, WR_EN_PROB = 0.01, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 8, WR_EN_PROB = 0.99, TREADY_PROB = 0.01
+	- OUTW = 24, DEPTH = 8, WR_EN_PROB = 0.001, TREADY_PROB = 0.99
+	- OUTW = 24, DEPTH = 8, WR_EN_PROB = 0.3, TREADY_PROB = 0.7
+	- OUTW = 24, DEPTH = 8, WR_EN_PROB = 0.5, TREADY_PROB = 0.5
+
+* Each testcase above produced 0 errors indicating successful implementation. 
+* Synthesis Summary: 
+	- Implemented design was synthesized at OUTW = 48 and DEPTH = 17. 
+	- The minimum clock period at which the design met the slack condition is 0.8ns (maximum operational clock frequency = 1.25 Ghz). 
+
+Contributions Made:- 
+
+* Equal contribution has been made by both the teammates in implementing the design, debugging the errors and in estimating maximum operational clock frequency. 

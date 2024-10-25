@@ -1,0 +1,16 @@
+								Status Report for Project Part-1  
+
+Members of the Team:- 
+
+1. Sushanth Reddy Gurram - 115668498
+2. Sai Akarsh Gokavarapu - 115910975 
+
+Project Part-1 :- 
+
+* Part-1 of the project included implementing both Unpipelined and Pipelined MAC units. 
+* Unpipelined MAC Unit was successfully implemented, tested and synthesized for INW=16 and OUTW=48 at minimum clock frequency of 1.5ns (Maximum Frequency possible = ~667 MHz). 
+* Pipelined MAC Unit was also successfully implemented, tested and synthesized for INW=16 and OUTW=48 at minimum clock frequency of 1.2ns (Maximum Frequency possible = ~834 MHz).
+
+Contributions Made:- 
+
+* Equal contribution has been made by both the teammates in implementing the design, debugging the errors and estimating maximum operational clock frequency. 

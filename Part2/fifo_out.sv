@@ -1,6 +1,6 @@
 module memory_dual_port #(
-    parameter WIDTH=48,
-    parameter SIZE=16,
+    parameter WIDTH=16,
+    parameter SIZE=64,
     localparam LOGSIZE= $clog2(SIZE)
  )(
     input [WIDTH-1:0] data_in,
@@ -143,7 +143,7 @@ logic [LOGDEPTH-1 : 0] wr_addr;
 logic rd_en;
 logic [LOGDEPTH-1 : 0] rd_addr;
 
-// control logic FOR AXIS_TVALID:
+// control logic FOR AXIS_TVALID
 always_comb begin
     if(capacity != DEPTH) begin
         AXIS_TVALID = 1;
@@ -153,7 +153,7 @@ always_comb begin
     end
 end
 
-// control logic for read enable signal:
+// control logic for read enable signal
 always_comb begin
     if(AXIS_TREADY && AXIS_TVALID) begin
         rd_en = 1;
@@ -163,7 +163,7 @@ always_comb begin
     end
 end
 
-// intantiating Head block:
+// intantiating Head block
 head_block #(.DEPTH(DEPTH)) head_block_inst (
     .clk(clk),
     .reset(reset),
@@ -171,7 +171,7 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .write_addr(wr_addr)
 );
 
- // instantiating Tail block:
+ // instantiating Tail block
  tail_block #(.DEPTH(DEPTH)) tail_block_inst (
     .clk(clk),
     .reset(reset),
@@ -179,7 +179,7 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .read_addr(rd_addr)
  );
 
- // instantiating capacity block:
+ // instantiating capacity block
  capacity_block #(.DEPTH(DEPTH)) capacity_block_inst(
     .clk(clk),
     .reset(reset),
@@ -188,10 +188,10 @@ head_block #(.DEPTH(DEPTH)) head_block_inst (
     .capacity(capacity)
  );
 
- // Instatiating Memory block:
+ // Instatiating Memory block
  memory_dual_port #(.WIDTH(OUTW),.SIZE(DEPTH)) memory_dual_port_inst (
     .data_in(data_in),
-    .data_out(AXIS_TDATA),// this will be wrong check before finalising
+    .data_out(AXIS_TDATA),
     .write_addr(wr_addr),
     .read_addr(rd_addr),
     .clk(clk),
