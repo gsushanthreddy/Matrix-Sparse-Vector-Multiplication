@@ -27,8 +27,8 @@ module input_mems #(
     logic wr_en_a;
     logic wr_en_b;
     // How to instantiate memory modules
-    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // wr_en signal to write values in memory? 
-    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); 
+    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // akarsh
+    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); // akarsh
     
     assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
     assign new_A = AXIS_TUSER[0];
@@ -80,9 +80,7 @@ module input_mems #(
             state <= start;
         end
         else begin
-            if(AXIS_TVALID && AXIS_TREADY) begin
-                
-            end
+            state <= next_state;
         end
     end
 
