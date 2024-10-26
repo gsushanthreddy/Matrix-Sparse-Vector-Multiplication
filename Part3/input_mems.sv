@@ -22,20 +22,37 @@ module input_mems #(
 );  
     logic [$clog2(MAXK+1)-1:0] TUSER_K;
     logic new_A;
-    logic [A_ADDR_BITS-1:0] A_write_ADDR;
-    logic [B_ADDR_BITS-1:0] B_write_ADDR;
+    logic [A_ADDR_BITS-1:0] A_address; // this shoulb be used for both writing and reading based on the state
+    logic [B_ADDR_BITS-1:0] B_address; // this shoulb be used for both writing and reading based on the state
     logic wr_en_a;
     logic wr_en_b;
     // How to instantiate memory modules
-    memory memory_a(AXIS_TDATA, A_data, A_read_addr, clk, ); // akarsh
-    memory memory_b(AXIS_TDATA, B_data, B_read_addr, clk, ); // akarsh
+    // Instantiation for Memory module "A"
+    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*K)) inst_memory_A ( //need to conform whether the size of the memory is (M*K) or (M*maxK)
+        .data_in(AXIS_TDATA),
+        .data_out(A_data),
+        .addr(A_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
+        .clk(clk),
+        .wr_en(wr_en_a)
+    ); // Done writing intantiation for the memory a
+    
+    // Instantiation for Memory module "B"
+    memory #(.WIDTH(B_ADDR_BITS),.SIZE(K*N)) inst_memory_B ( //need to conform whether the size of the memory is (K*N) or (maxK*N)
+        .data_in(AXIS_TDATA),
+        .data_out(B_data),
+        .addr(B_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
+        .clk(clk),
+        .wr_en(wr_en_b)
+    ); // Done writing intantiation for the memory b
     
     assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
     assign new_A = AXIS_TUSER[0];
 
-    enum {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
-
+    enum [1:0] {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
+    // in the above line i have assigned the bit length for declaring states
     always_comb begin
+
+    // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT??
         if(state==start) begin
             if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
                 if(new_A==1) begin
