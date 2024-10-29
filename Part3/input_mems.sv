@@ -29,28 +29,29 @@ module input_mems #(
 
     // How to instantiate memory modules
     // Instantiation for Memory module "A"
-    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*maxK)) inst_memory_A ( //need to conform whether the size of the memory is (M*K) or (M*maxK)
+    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*maxK)) inst_memory_A ( 
         .data_in(AXIS_TDATA),
         .data_out(A_data),
         .addr(A_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
         .clk(clk),
         .wr_en(wr_en_a)
-    ); // Done writing intantiation for the memory a
+    );
     
     // Instantiation for Memory module "B"
-    memory #(.WIDTH(B_ADDR_BITS),.SIZE(maxK*N)) inst_memory_B ( //need to conform whether the size of the memory is (K*N) or (maxK*N)
+    memory #(.WIDTH(B_ADDR_BITS),.SIZE(maxK*N)) inst_memory_B ( 
         .data_in(AXIS_TDATA),
         .data_out(B_data),
         .addr(B_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
         .clk(clk),
         .wr_en(wr_en_b)
-    ); // Done writing intantiation for the memory b
+    ); 
     
     assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
     assign new_A = AXIS_TUSER[0];
 
     enum [1:0] {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
-    // in the above line i have assigned the bit length for declaring states - Why? enum handles the sizing issues
+    // in the above line i have assigned the bit length for declaring states - Why? enum handles the sizing issues As: its good way to specify everything, not necessary though
+
     always_comb begin
     // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT?? - Ans: No, this way the code is more readable and comprehensible 
         if(state==start) begin
@@ -83,7 +84,8 @@ module input_mems #(
             end
             else begin
                 wr_en_a = 1;
-                wr_en_b = 1;
+                wr_en_b = 1; // this should not happen because it will data will be loaded to the memory b in the first slot,you should not right away give that
+                // Ans would be when address_a is maxk*M then give wr_en_b to 1
                 next_state = load_a_and_b; // Datapath configuration has to be added in this state
             end
         end
