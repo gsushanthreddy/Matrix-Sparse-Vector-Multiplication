@@ -22,8 +22,8 @@ module input_mems #(
 );  
     logic [$clog2(MAXK+1)-1:0] TUSER_K;
     logic new_A;
-    logic [A_ADDR_BITS-1:0] A_address; // this shoulb be used for both writing and reading based on the state
-    logic [B_ADDR_BITS-1:0] B_address; // this shoulb be used for both writing and reading based on the state
+    logic [A_ADDR_BITS-1:0] A_address; // this should be used for both writing and reading based on the state
+    logic [B_ADDR_BITS-1:0] B_address; // this should be used for both writing and reading based on the state
     logic wr_en_a;
     logic wr_en_b;
 
@@ -50,46 +50,62 @@ module input_mems #(
     assign new_A = AXIS_TUSER[0];
 
     enum [1:0] {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
-    // in the above line i have assigned the bit length for declaring states
+    // in the above line i have assigned the bit length for declaring states - Why? enum handles the sizing issues
     always_comb begin
-    // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT??
+    // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT?? - Ans: No, this way the code is more readable and comprehensible 
         if(state==start) begin
-            clear_counter_A = 1;
-            clear_counter_B = 1;
             if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
                 if(new_A==1) begin
+                    clear_counter_A = 1;
+                    clear_counter_B = 1;
+                    wr_en_a = 1;
+                    wr_en_b = 1;
                     next_state = load_a_and_b;
                 end 
                 else begin
+                    clear_counter_A = 0;
+                    clear_counter_B = 1;
+                    wr_en_a = 0;
+                    wr_en_b = 1;
                     next_state = load_b;
                 end 
+                K = TUSER_K;
             end
             else begin
                 next_state = start;
             end         
         end
         else if(state==load_a_and_b) begin
-            if(matrices_loaded==1) begin
+            if(matrices_loaded==1) begin // Where are we setting matrices loaded? Ans: When both the memory address counters reach M*K and K*N
+                wr_en_a = 0;
+                wr_en_b = 0;
                 next_state = read;
             end
             else begin
-                next_state = load_a_and_b;
+                wr_en_a = 1;
+                wr_en_b = 1;
+                next_state = load_a_and_b; // Datapath configuration has to be added in this state
             end
         end
         else if(state==load_b) begin
-            if(matrices_loaded==1) begin
+            if(matrices_loaded==1) begin // Where are we setting matrices loaded? Ans: When both the memory address counters reach M*K and K*N 
+                wr_en_a = 0;
+                wr_en_b = 0;
                 next_state = read;
             end
             else begin
+                wr_en_a = 0;
+                wr_en_b = 1;
                 next_state = load_b;
             end
         end
-        else if(state==read) begin
+        else if(state==read) begin // No need to handle wr_en signals in this state because only reading operation is done by the MAC Unit 
             if(compute_finished==1) begin
-               next_state = start;
+                matrices_loaded = 0;
+                next_state = start;
             end
             else begin
-               next_state = read;
+                next_state = read;
             end
         end
     end
@@ -121,32 +137,11 @@ module input_mems #(
         end
     end
 
-    always_comb begin
-        if(compute_finished) begin
-            clear_counter_A = 0;
-            clear_counter_B = 0;
-            matrices_loaded = 0;
-            if(AXIS_TREADY && AXIS_TVALID) begin
-                if(new_A) begin
-                    wr_en_a = 1;
-                    wr_en_b = 0;
-                end
-                else begin 
-                    wr_en_a = 0;
-                    wr_en_b = 1;
-                end
-            end
-            else begin 
-                wr_en_a = 0;
-                wr_en_b = 0;
-            end
-        end
-    end
     /* Next steps :- 
-        1. Logic for load_a_and_b, load_b and read states
-        2. Handling wr_en_a and wr_en_b signals 
-        3. Storing K and new_A values 
-        4. Read Addresses computation for mem_a and mem_b  
+        1. Logic for load_a_and_b, load_b and read states - Ans: Datapath integration 
+        2. Handling wr_en_a and wr_en_b signals - Ans: wr_en signals are to be generated inside FSM. These signals are sent to the datapath for writing into memories.
+        3. Storing K and new_A values - Ans: K value can be sent as the output at first clock edge inside "start" state. There is no need to store new_A value since we are using new_A value to check in the "start" state only - Task is done, Need to verify
+        4. Read Addresses computation for mem_a and mem_b - Ans: Above memory block instantiation handles this - Task is done, Need to verify 
     */
 endmodule
 
