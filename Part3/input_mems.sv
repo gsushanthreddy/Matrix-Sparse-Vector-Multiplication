@@ -26,6 +26,7 @@ module input_mems #(
     logic [B_ADDR_BITS-1:0] B_address; // this shoulb be used for both writing and reading based on the state
     logic wr_en_a;
     logic wr_en_b;
+
     // How to instantiate memory modules
     // Instantiation for Memory module "A"
     memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*maxK)) inst_memory_A ( //need to conform whether the size of the memory is (M*K) or (M*maxK)
@@ -53,6 +54,8 @@ module input_mems #(
     always_comb begin
     // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT??
         if(state==start) begin
+            clear_counter_A = 1;
+            clear_counter_B = 1;
             if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
                 if(new_A==1) begin
                     next_state = load_a_and_b;
@@ -92,6 +95,24 @@ module input_mems #(
     end
 
     always_ff @(posedge clk) begin
+        if(clear_counter_A) begin
+            A_address <= 0;
+        end 
+        else begin
+            A_address <= A_address+1;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if(clear_counter_B) begin
+            B_address <= 0;
+        end 
+        else begin
+            B_address <= B_address+1;
+        end
+    end
+
+    always_ff @(posedge clk) begin
         if(reset) begin
             state <= start;
         end
@@ -100,6 +121,27 @@ module input_mems #(
         end
     end
 
+    always_comb begin
+        if(compute_finished) begin
+            clear_counter_A = 0;
+            clear_counter_B = 0;
+            matrices_loaded = 0;
+            if(AXIS_TREADY && AXIS_TVALID) begin
+                if(new_A) begin
+                    wr_en_a = 1;
+                    wr_en_b = 0;
+                end
+                else begin 
+                    wr_en_a = 0;
+                    wr_en_b = 1;
+                end
+            end
+            else begin 
+                wr_en_a = 0;
+                wr_en_b = 0;
+            end
+        end
+    end
     /* Next steps :- 
         1. Logic for load_a_and_b, load_b and read states
         2. Handling wr_en_a and wr_en_b signals 
