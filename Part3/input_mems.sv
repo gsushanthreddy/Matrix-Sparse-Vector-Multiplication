@@ -28,7 +28,7 @@ module input_mems #(
     logic wr_en_b;
     // How to instantiate memory modules
     // Instantiation for Memory module "A"
-    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*K)) inst_memory_A ( //need to conform whether the size of the memory is (M*K) or (M*maxK)
+    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*maxK)) inst_memory_A ( //need to conform whether the size of the memory is (M*K) or (M*maxK)
         .data_in(AXIS_TDATA),
         .data_out(A_data),
         .addr(A_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
@@ -37,7 +37,7 @@ module input_mems #(
     ); // Done writing intantiation for the memory a
     
     // Instantiation for Memory module "B"
-    memory #(.WIDTH(B_ADDR_BITS),.SIZE(K*N)) inst_memory_B ( //need to conform whether the size of the memory is (K*N) or (maxK*N)
+    memory #(.WIDTH(B_ADDR_BITS),.SIZE(maxK*N)) inst_memory_B ( //need to conform whether the size of the memory is (K*N) or (maxK*N)
         .data_in(AXIS_TDATA),
         .data_out(B_data),
         .addr(B_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
@@ -51,7 +51,6 @@ module input_mems #(
     enum [1:0] {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
     // in the above line i have assigned the bit length for declaring states
     always_comb begin
-
     // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT??
         if(state==start) begin
             if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
