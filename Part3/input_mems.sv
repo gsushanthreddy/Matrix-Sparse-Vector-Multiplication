@@ -26,78 +26,112 @@ module input_mems #(
     logic [B_ADDR_BITS-1:0] B_address; // this should be used for both writing and reading based on the state
     logic wr_en_a;
     logic wr_en_b;
+    logic clear_counter_A;
+    logic clear_counter_B;
+    logic increment_a;
+    logic increment_b;
+    logic [A_ADDR_BITS-1:0] address_to_a_memory;
+    logic [B_ADDR_BITS-1:0] address_to_b_memory;
 
-    // How to instantiate memory modules
+    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
+    assign new_A = AXIS_TUSER[0];
+
+    // Counter and Comparator logic for A
+    always_ff @(posedge clk) begin
+        if(reset || clear_counter_A) begin
+            A_address <= 0;
+        end 
+        else begin
+            if(increment_a) begin
+                A_address <= A_address+1;
+            end
+            else if(A_address == M*K) begin
+                clear_counter_A <= 1;
+            end
+        end
+    end
+
     // Instantiation for Memory module "A"
-    memory #(.WIDTH(A_ADDR_BITS),.SIZE(M*maxK)) inst_memory_A ( 
+    memory #(.WIDTH(INW),.SIZE(M*MAXK)) inst_memory_A ( 
         .data_in(AXIS_TDATA),
         .data_out(A_data),
-        .addr(A_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
+        .addr(address_to_a_memory), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
         .clk(clk),
         .wr_en(wr_en_a)
     );
     
+    // Counter and Comparator logic for B
+    always_ff @(posedge clk) begin
+        if(reset || clear_counter_B) begin
+            B_address <= 0;
+        end 
+        else begin
+            if(increment_b) begin
+                B_address <= B_address+1;
+            end
+            else if(B_address == K*N) begin
+                clear_counter_B <= 1;
+            end
+        end
+    end
+
     // Instantiation for Memory module "B"
-    memory #(.WIDTH(B_ADDR_BITS),.SIZE(maxK*N)) inst_memory_B ( 
+    memory #(.WIDTH(INW),.SIZE(MAXK*N)) inst_memory_B ( 
         .data_in(AXIS_TDATA),
         .data_out(B_data),
-        .addr(B_address), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
+        .addr(address_to_b_memory), // Given read address then what about write address : TAKEN CARE IN LOGIC DECLARATION
         .clk(clk),
         .wr_en(wr_en_b)
     ); 
     
-    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
-    assign new_A = AXIS_TUSER[0];
-
-    enum [1:0] {start, load_a_and_b, read, load_b} state, next_state; // reset state renamed to start state
-    // in the above line i have assigned the bit length for declaring states - Why? enum handles the sizing issues As: its good way to specify everything, not necessary though
-
+    // Declaring atates for FSM
+    enum {start, load_a, load_b, read} state, next_state; 
+    
+    // combination logic for determing the next state of FSM
     always_comb begin
-    // Sushanth, WHY TO WRITE LIKE THIS, CODE SEEMS REDUNDANT?? - Ans: No, this way the code is more readable and comprehensible 
-        if(state==start) begin
+        wr_en_a = 0;
+        wr_en_b = 0;
+        matrices_loaded = 0;    
+        if(state == start) begin
             if(AXIS_TREADY==1 && AXIS_TVALID==1) begin
                 if(new_A==1) begin
-                    clear_counter_A = 1;
-                    clear_counter_B = 1;
                     wr_en_a = 1;
-                    wr_en_b = 1;
-                    next_state = load_a_and_b;
+                    K = TUSER_K;
+                    next_state = load_a;
                 end 
                 else begin
-                    clear_counter_A = 0;
-                    clear_counter_B = 1;
-                    wr_en_a = 0;
                     wr_en_b = 1;
                     next_state = load_b;
                 end 
-                K = TUSER_K;
             end
             else begin
                 next_state = start;
             end         
         end
-        else if(state==load_a_and_b) begin
-            if(matrices_loaded==1) begin // Where are we setting matrices loaded? Ans: When both the memory address counters reach M*K and K*N
+        else if(state==load_a) begin
+            if(A_address == M*K) begin // Change is required here - A_memory counter reaches DEPTH, that should be written here 
                 wr_en_a = 0;
-                wr_en_b = 0;
-                next_state = read;
+                next_state = load_b;
             end
             else begin
-                wr_en_a = 1;
-                wr_en_b = 1; // this should not happen because it will data will be loaded to the memory b in the first slot,you should not right away give that
-                // Ans would be when address_a is maxk*M then give wr_en_b to 1
-                next_state = load_a_and_b; // Datapath configuration has to be added in this state
+                if(AXIS_TVALID) begin
+                    wr_en_a = 1;
+                    increment_a = 1;
+                end
+                next_state = load_a; // Datapath configuration has to be added in this state
             end
         end
         else if(state==load_b) begin
-            if(matrices_loaded==1) begin // Where are we setting matrices loaded? Ans: When both the memory address counters reach M*K and K*N 
-                wr_en_a = 0;
+            if(B_address == K*N) begin // Where are we setting matrices loaded? Ans: When both the memory address counters reach M*K and K*N 
                 wr_en_b = 0;
                 next_state = read;
+                matrices_loaded = 1;
             end
             else begin
-                wr_en_a = 0;
-                wr_en_b = 1;
+                if(AXIS_TVALID) begin
+                    wr_en_b = 1;
+                    increment_b = 1;
+                end
                 next_state = load_b;
             end
         end
@@ -105,31 +139,36 @@ module input_mems #(
             if(compute_finished==1) begin
                 matrices_loaded = 0;
                 next_state = start;
+
             end
             else begin
                 next_state = read;
             end
         end
     end
-
-    always_ff @(posedge clk) begin
-        if(clear_counter_A) begin
-            A_address <= 0;
-        end 
+    
+    // Logic for generating AXIS_Tready after compute is finished
+    always_comb begin
+        if(matrices_loaded == 1) begin
+            AXIS_TREADY = 0;
+        end
         else begin
-            A_address <= A_address+1;
+            AXIS_TREADY = 1;
         end
     end
 
-    always_ff @(posedge clk) begin
-        if(clear_counter_B) begin
-            B_address <= 0;
-        end 
+    always_comb begin 
+        if(matrices_loaded) begin
+            address_to_a_memory = A_read_addr;
+            address_to_b_memory = B_read_addr;
+        end
         else begin
-            B_address <= B_address+1;
+            address_to_a_memory = A_address;
+            address_to_b_memory = B_address;
         end
     end
-
+    
+    // Output logic for FSM
     always_ff @(posedge clk) begin
         if(reset) begin
             state <= start;
