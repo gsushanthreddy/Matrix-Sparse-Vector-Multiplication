@@ -20,10 +20,9 @@ module input_mems #(
     input [B_ADDR_BITS-1:0] B_read_addr,
     output logic signed [INW-1:0] B_data
 ); 
+endmodule
 
-endmodle
-
-module address_counter()
+module address_counter_A()
     always_ff @(posedge clk) begin
         if(clear) begin
             address <= 0;
