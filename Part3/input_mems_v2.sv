@@ -36,8 +36,6 @@ module input_mems #(
     logic wr_en_A;
     logic wr_en_B;
     
-    logic matrices_loaded;
-    
     // Status Signals
     logic matrix_A_loaded;
     logic matrix_B_loaded;
