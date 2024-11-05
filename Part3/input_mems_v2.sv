@@ -28,19 +28,19 @@ module input_mems #(
     assign new_A = AXIS_TUSER[0];
     
     // Control signals
-    input clear_counter_A;
-    input clear_counter_B;
-    input increment_counter_A;
-    input increment_counter_B;
+    logic clear_counter_A;
+    logic clear_counter_B;
+    logic increment_counter_A;
+    logic increment_counter_B;
 
-    input wr_en_A;
-    input wr_en_B;
+    logic wr_en_A;
+    logic wr_en_B;
     
-    input matrices_loaded;
+    logic matrices_loaded;
     
     // Status Signals
-    output logic matrix_A_loaded;
-    output logic matrix_B_loaded;
+    logic matrix_A_loaded;
+    logic matrix_B_loaded;
 
     // instantiation of FSM
     input_mems_fsm #(.MAXK(MAXK)) fsm_inst( //Akarsh comment: Added verify
