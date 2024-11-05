@@ -1,4 +1,4 @@
-module fsm(
+module input_mems_fsm(
     input clk, reset,
     input AXIS_TVALID,
     input compute_finished,
@@ -34,6 +34,7 @@ module fsm(
                     wr_en_a = 1;
                     increment_counter_A = 1; // Akarsh changes: becaues you are entering loading state so you have to udate address
                     next_state = load_a;
+                    // Akarsh comment: Where to handle output K?
                 end
                 else begin
                     clear_counter_B = 0;
