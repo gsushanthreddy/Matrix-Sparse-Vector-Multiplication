@@ -1,5 +1,6 @@
-module input_mems_fsm(
-        parameter MAXK = 8 // add this while connecting fsm and datapath
+module input_mems_fsm #(
+        parameter MAXK = 8, // add this while connecting fsm and datapath
+        localparam K_BITS = $clog2(MAXK+1)
     )( 
     input clk, reset,
     input AXIS_TVALID,
