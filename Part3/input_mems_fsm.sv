@@ -1,10 +1,13 @@
 module input_mems_fsm(
+        parameter MAXK = 8 // add this while connecting fsm and datapath
+    )( 
     input clk, reset,
     input AXIS_TVALID,
     input compute_finished,
     input new_A,
     input matrix_A_loaded,
     input matrix_B_loaded,
+    input [K_BITS:0] AXIS_TUSER, // add this while connecting fsm and datapath
 
     output logic clear_counter_A,
     output logic clear_counter_B,
@@ -13,7 +16,8 @@ module input_mems_fsm(
     output logic matrices_loaded,
     output logic wr_en_a,
     output logic wr_en_b,
-    output logic AXIS_TREADY
+    output logic AXIS_TREADY,
+    output logic K // add this while connecting fsm and datapath
 );
     enum {start, load_a, load_b, read} state, next_state;
 
@@ -109,6 +113,12 @@ module input_mems_fsm(
         end
         else begin
             state <= next_state;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if(AXIS_TVALID && AXIS_TREADY && state==start) begin //check logic
+            K <= AXIS_TUSER[$clog2(MAXK+1):1];
         end
     end
 endmodule
