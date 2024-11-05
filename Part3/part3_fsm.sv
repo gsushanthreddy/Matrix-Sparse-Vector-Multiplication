@@ -32,11 +32,13 @@ module fsm(
                 if (new_A) begin
                     clear_counter_A = 0;
                     wr_en_a = 1;
+                    increment_counter_A = 1; // Akarsh changes: becaues you are entering loading state so you have to udate address
                     next_state = load_a;
                 end
                 else begin
                     clear_counter_B = 0;
                     wr_en_b = 1;
+                    increment_counter_B = 1; // Akarsh changes: becaues you are entering loading state so you have to udate address
                     next_state = load_b;
                 end
             end 
@@ -87,6 +89,8 @@ module fsm(
         end
         else if (state==read) begin
             if (compute_finished) begin
+                clear_counter_A = 1; // Akarsh changes: is it required i am not sure, verify
+                clear_counter_B = 1; // Akarsh changes: is it required i am not sure, verify
                 next_state = start;
             end
             else begin
