@@ -21,10 +21,10 @@ module input_mems #(
     output logic signed [INW-1:0] B_data
 );
 
-    logic [$clog2(MAXK+1)-1:0] TUSER_K;
+    //logic [$clog2(MAXK+1)-1:0] TUSER_K; "made this comment because u=you aded the same logic in fsm"
     logic new_A;  
 
-    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
+    //assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; "made this comment because u=you aded the same logic in fsm" 
     assign new_A = AXIS_TUSER[0];
     
     // Control signals
@@ -43,7 +43,7 @@ module input_mems #(
     output logic matrix_B_loaded;
 
     // instantiation of FSM
-    input_mems_fsm fsm_inst(
+    input_mems_fsm #(.MAXK(MAXK)) fsm_inst( //Akarsh comment: Added verify
         .clk(clk),
         .reset(reset),
         .AXIS_TVALID(AXIS_TVALID),
@@ -51,6 +51,7 @@ module input_mems #(
         .new_A(new_A),
         .matrix_A_loaded(matrix_A_loaded),
         .matrix_B_loaded(matrix_B_loaded),
+        .AXIS_TUSER(AXIS_TUSER), //Akarsh comment: Addes, verify once
 
         .clear_counter_A(clear_counter_A),
         .clear_counter_B(clear_counter_B),
@@ -59,7 +60,8 @@ module input_mems #(
         .matrices_loaded(matrices_loaded),
         .wr_en_a(wr_en_A),
         .wr_en_b(wr_en_B),
-        .AXIS_TREADY(AXIS_TREADY)
+        .AXIS_TREADY(AXIS_TREADY),
+        .K(K) // Akarsh Comment: Added, verify once
         // Akarsh comment: output K is missing over here
     );
 
