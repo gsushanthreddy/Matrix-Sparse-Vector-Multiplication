@@ -18,7 +18,7 @@ module input_mems_fsm #(
     output logic wr_en_a,
     output logic wr_en_b,
     output logic AXIS_TREADY,
-    output logic K // add this while connecting fsm and datapath
+    output logic [K_BITS-1:0] K // add this while connecting fsm and datapath
 );
     enum {start, load_a, load_b, read} state, next_state;
 
