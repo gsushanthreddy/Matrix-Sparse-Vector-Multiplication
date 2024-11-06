@@ -54,7 +54,7 @@ module input_mems #(
                             next_state <= load_a;
                         end
                         else begin
-                            next_state = load_b;
+                            next_state <= load_b;
                         end
                     end
                 end
@@ -88,7 +88,7 @@ module input_mems #(
                     if (compute_finished) begin
                         matrices_loaded <= 0;
                         AXIS_TREADY <= 1;
-                        next_state = start;
+                        next_state <= start;
                     end
                     else begin
                         AXIS_TREADY <= 0;
