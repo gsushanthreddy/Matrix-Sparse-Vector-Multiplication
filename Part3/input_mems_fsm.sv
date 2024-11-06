@@ -34,14 +34,14 @@ module input_mems_fsm #(
 
         if (state==start) begin
             if (AXIS_TVALID && AXIS_TREADY) begin
-                if (new_A) begin
+                if (new_A==1) begin
                     clear_counter_A = 0;
                     wr_en_a = 1;
                     increment_counter_A = 1; // Akarsh changes: becaues you are entering loading state so you have to udate address
                     next_state = load_a;
                     // Akarsh comment: Where to handle output K?
                 end
-                else begin
+                else if(new_A==0) begin
                     clear_counter_B = 0;
                     wr_en_b = 1;
                     increment_counter_B = 1; // Akarsh changes: becaues you are entering loading state so you have to udate address
@@ -97,6 +97,7 @@ module input_mems_fsm #(
                 clear_counter_A = 1; // Akarsh changes: is it required i am not sure, verify
                 clear_counter_B = 1; // Akarsh changes: is it required i am not sure, verify
                 next_state = start;
+                matrices_loaded = 0;
             end
             else begin
                 clear_counter_A = 0;
