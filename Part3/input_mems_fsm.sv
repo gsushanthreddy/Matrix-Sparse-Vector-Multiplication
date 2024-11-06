@@ -84,7 +84,6 @@ module input_mems_fsm #(
                     clear_counter_A = 0;
                     clear_counter_B = 0;
                     matrices_loaded = 1;
-                    AXIS_TREADY = 0;
                     next_state = read;
                 end
             end
@@ -103,6 +102,7 @@ module input_mems_fsm #(
                 clear_counter_A = 0;
                 clear_counter_B = 0;
                 matrices_loaded = 1;
+                AXIS_TREADY = 0;
                 next_state = read;
             end
         end
