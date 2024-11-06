@@ -43,13 +43,13 @@ module input_mems_datapath #(
     logic clear_counter_B;
 
     
-    // Logic for address counter fr 'A'
+    // Logic for address counter for 'A'
     always_ff @(posedge clk) begin
         if(reset || clear_counter_A) begin
             A_write_address <= 0;
         end
         else begin
-            if ((AXIS_TVALID == 1) && (A_write_address < (M*K)-1)) begin
+            if (AXIS_TVALID == 1) begin
                 A_write_address <= A_write_address + 1; 
             end 
         end
@@ -61,13 +61,13 @@ module input_mems_datapath #(
     end
     
 
-    // Instantiating counter for 'B' address
+    // Logic for Adress counter for 'B'
     always_ff @(posedge clk) begin
         if(reset || clear_counter_B) begin
             B_write_address <= 0;
         end
         else begin
-            if ((AXIS_TVALID == 1) && (B_write_address < (K*N)-1)) begin
+            if (AXIS_TVALID == 1) begin
                 B_write_address <= B_write_address + 1; 
             end 
         end
