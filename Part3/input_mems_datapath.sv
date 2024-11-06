@@ -47,6 +47,7 @@ module input_mems_datapath #(
     always_ff @(posedge clk) begin
         if(reset || clear_counter_A) begin
             A_write_address <= 0;
+            matrix_A_loaded <= 0;
         end
         else begin
             if (wr_en_A) begin
@@ -65,6 +66,8 @@ module input_mems_datapath #(
     always_ff @(posedge clk) begin
         if(reset || clear_counter_B) begin
             B_write_address <= 0;
+            matrix_B_loaded <= 0;
+
         end
         else begin
             if (wr_en_B) begin
