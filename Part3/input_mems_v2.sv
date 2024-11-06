@@ -26,12 +26,6 @@ module input_mems #(
 
     //assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; "made this comment because u=you aded the same logic in fsm" 
     assign new_A = AXIS_TUSER[0];
-    
-    // Control signals
-    logic clear_counter_A;
-    logic clear_counter_B;
-    logic increment_counter_A;
-    logic increment_counter_B;
 
     logic wr_en_A;
     logic wr_en_B;
@@ -51,16 +45,11 @@ module input_mems #(
         .matrix_B_loaded(matrix_B_loaded),
         .AXIS_TUSER(AXIS_TUSER), //Akarsh comment: Addes, verify once
 
-        .clear_counter_A(clear_counter_A),
-        .clear_counter_B(clear_counter_B),
-        .increment_counter_A(increment_counter_A),
-        .increment_counter_B(increment_counter_B),
         .matrices_loaded(matrices_loaded),
         .wr_en_a(wr_en_A),
         .wr_en_b(wr_en_B),
         .AXIS_TREADY(AXIS_TREADY),
-        .K(K) // Akarsh Comment: Added, verify once
-        // Akarsh comment: output K is missing over here
+        .K(K)
     );
 
     // instantiation of Datapath
@@ -68,6 +57,7 @@ module input_mems #(
         .clk(clk),
         .reset(reset),
         .AXIS_TDATA(AXIS_TDATA),
+        .AXIS_TVALID(AXIS_TVALID),
 
         .A_read_addr(A_read_addr),
         .A_data(A_data),
@@ -75,11 +65,6 @@ module input_mems #(
         .B_data(B_data),
         
         .K(K),
-
-        .clear_counter_A(clear_counter_A),
-        .clear_counter_B(clear_counter_B),
-        .increment_counter_A(increment_counter_A),
-        .increment_counter_B(increment_counter_B),
 
         .wr_en_A(wr_en_A),
         .wr_en_B(wr_en_B),

@@ -20,6 +20,11 @@ module input_mems_datapath #(
     input [K_BITS-1:0] K,
     
     // Control signals
+    /*input clear_counter_A,
+    input clear_counter_B,
+    input increment_counter_A,
+    input increment_counter_B,*/
+
     input wr_en_A,
     input wr_en_B,
     
@@ -39,44 +44,44 @@ module input_mems_datapath #(
     logic signed [INW-1:0] A_data_out;
     logic signed [INW-1:0] B_data_out;
 
-    logic clear_counter_A;
-    logic clear_counter_B;
-
     
-    // Logic for address counter fr 'A'
-    always_ff @(posedge clk) begin
-        if(reset || clear_counter_A) begin
-            A_write_address <= 0;
-        end
-        else begin
-            if ((AXIS_TVALID == 1) && (A_write_address < (M*K)-1)) begin
-                A_write_address <= A_write_address + 1; 
-            end 
-        end
-
-        if (A_write_address < (M*K)-1) begin
-            clear_counter_A <= 1;
-            matrix_A_loaded <= 1;
-        end
-    end
-    
+    // Instantiating counter for 'A' address
+    address_counter #(.ROW_SIZE(M),.COLUMN_SIZE(MAXK)) count_a_address(
+        .clk(clk),
+        .reset(reset),
+        .AXIS_TVALID(AXIS_TVALID),
+        .matrix_loaded(matrix_A_loaded),
+        .address(A_write_address)
+    );
 
     // Instantiating counter for 'B' address
-    always_ff @(posedge clk) begin
-        if(reset || clear_counter_B) begin
-            B_write_address <= 0;
-        end
-        else begin
-            if ((AXIS_TVALID == 1) && (B_write_address < (K*N)-1)) begin
-                B_write_address <= B_write_address + 1; 
-            end 
-        end
+    address_counter #(.ROW_SIZE(MAXK),.COLUMN_SIZE(N)) count_b_address(
+        .clk(clk),
+        .reset(reset),
+        .AXIS_TVALID(AXIS_TVALID),
+        .matrix_loaded(matrix_B_loaded),
+        .address(B_write_address)
+    );
 
-        if (B_write_address < (K*N)-1) begin
-            clear_counter_B <= 1;
-            matrix_B_loaded <= 1;
+    // Comparator logic for address_A counter
+    /*always_comb begin
+        if (A_write_address == (M*K)-1) begin
+            matrix_A_loaded = 1;
+        end 
+        else begin
+            matrix_A_loaded = 0;
         end
     end
+
+    // Comparator logic for address_B counter
+    always_comb begin
+        if (B_write_address == (K*N)-1) begin
+            matrix_B_loaded = 1;
+        end 
+        else begin
+            matrix_B_loaded = 0;
+        end
+    end*/
 
     // Determing which address to give to memory A
     always_comb begin
@@ -137,6 +142,51 @@ module input_mems_datapath #(
     end
 
 endmodule
+
+
+// Address counter logic
+module address_counter #(
+    parameter ROW_SIZE = 7,
+    parameter COLUMN_SIZE = 8,
+    localparam ADDR_BITS = $clog2(ROW_SIZE*COLUMN_SIZE)
+) (
+    input clk,
+    input reset,
+    input AXIS_TVALID,
+    input K,
+    output logic matrix_loaded,
+    output logic [ADDR_BITS-1:0] address
+);
+    logic clear_counter;
+
+    always_ff @(posedge clk) begin
+        if(reset || clear_counter) begin
+            address <= 0;
+        end
+        else begin
+            if ((AXIS_TVALID==1) && (address < (ROW_SIZE*COLUMN_SIZE)-1)) begin
+                address <= address + 1; 
+            end 
+        end
+
+        if (address < (ROW_SIZE*COLUMN_SIZE)-1) begin
+            clear_counter <= 1;
+            matrix_loaded <= 1;
+        end
+        
+    end
+    /*always_ff @(posedge clk) begin
+        if (clear_counter) begin
+            address <= 0;
+        end 
+        else if (increment_counter) begin
+            address <= address+1;
+        end 
+        
+    end*/
+endmodule
+
+
 
 // Memory logic
 module memory #(
