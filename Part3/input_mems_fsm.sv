@@ -27,7 +27,7 @@ module input_mems_fsm #(
         clear_counter_B = 1;
         increment_counter_A = 0;
         increment_counter_B = 0;
-        matrices_loaded = 0;
+        // matrices_loaded = 0;
         wr_en_a = 0;
         wr_en_b = 0;
         AXIS_TREADY = 1;
@@ -96,6 +96,7 @@ module input_mems_fsm #(
             if (compute_finished) begin
                 clear_counter_A = 1; // Akarsh changes: is it required i am not sure, verify
                 clear_counter_B = 1; // Akarsh changes: is it required i am not sure, verify
+                matrices_loaded = 0;
                 next_state = start;
             end
             else begin
@@ -118,7 +119,7 @@ module input_mems_fsm #(
     end
 
     always_ff @(posedge clk) begin
-        if(AXIS_TVALID && AXIS_TREADY && state==start) begin //check logic
+        if(AXIS_TVALID==1 && AXIS_TREADY==1 && new_A==1 && state==start) begin //check logic
             K <= AXIS_TUSER[$clog2(MAXK+1):1];
         end
     end
