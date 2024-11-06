@@ -54,7 +54,7 @@ module input_mems_datapath #(
             end 
         end
 
-        if (A_write_address < (M*K)-1) begin
+        if (A_write_address == (M*K)-1) begin
             clear_counter_A <= 1;
             matrix_A_loaded <= 1;
         end
@@ -72,7 +72,7 @@ module input_mems_datapath #(
             end 
         end
 
-        if (B_write_address < (K*N)-1) begin
+        if (B_write_address == (K*N)-1) begin
             clear_counter_B <= 1;
             matrix_B_loaded <= 1;
         end
