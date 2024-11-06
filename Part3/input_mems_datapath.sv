@@ -49,7 +49,7 @@ module input_mems_datapath #(
             A_write_address <= 0;
         end
         else begin
-            if (AXIS_TVALID == 1) begin
+            if (wr_en_A) begin
                 A_write_address <= A_write_address + 1; 
             end 
         end
@@ -67,7 +67,7 @@ module input_mems_datapath #(
             B_write_address <= 0;
         end
         else begin
-            if (AXIS_TVALID == 1) begin
+            if (wr_en_B) begin
                 B_write_address <= B_write_address + 1; 
             end 
         end
