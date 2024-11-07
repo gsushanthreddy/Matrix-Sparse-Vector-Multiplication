@@ -39,45 +39,47 @@ module input_mems_datapath #(
     logic signed [INW-1:0] A_data_out;
     logic signed [INW-1:0] B_data_out;
 
-    logic clear_counter_A;
-    logic clear_counter_B;
-
     
     // Logic for address counter for 'A'
     always_ff @(posedge clk) begin
-        if(reset || clear_counter_A) begin
+        if(reset) begin
             A_write_address <= 0;
             matrix_A_loaded <= 0;
         end
         else begin
-            if (wr_en_A) begin
+            if (wr_en_A && AXIS_TVALID) begin
                 A_write_address <= A_write_address + 1; 
+                if (A_write_address == (M*K)-1) begin
+                    A_write_address <= 0;
+                    matrix_A_loaded <= 1;
+                end
             end 
         end
 
-        if (A_write_address == (M*K)-1) begin
-            clear_counter_A <= 1;
-            matrix_A_loaded <= 1;
+        if (matrices_loaded == 1) begin
+            matrix_A_loaded <= 0;
         end
     end
     
 
     // Logic for Adress counter for 'B'
     always_ff @(posedge clk) begin
-        if(reset || clear_counter_B) begin
+        if(reset) begin
             B_write_address <= 0;
             matrix_B_loaded <= 0;
-
         end
         else begin
-            if (wr_en_B) begin
+            if (wr_en_B && AXIS_TVALID) begin
                 B_write_address <= B_write_address + 1; 
+                if (B_write_address == (K*N)-1) begin
+                    B_write_address <= 0;
+                    matrix_B_loaded <= 1;
+                end
             end 
         end
 
-        if (B_write_address == (K*N)-1) begin
-            clear_counter_B <= 1;
-            matrix_B_loaded <= 1;
+        if (matrices_loaded == 1) begin
+            matrix_B_loaded <= 0;
         end
     end
 

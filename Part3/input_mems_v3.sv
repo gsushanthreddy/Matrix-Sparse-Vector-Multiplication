@@ -49,11 +49,11 @@ module input_mems #(
             case (state) 
                 start: begin
                     if (AXIS_TVALID && AXIS_TREADY) begin
-                        if (new_A) begin
+                        if (new_A==1) begin
                             K <= TUSER_K;
                             next_state <= load_a;
                         end
-                        else begin
+                        else if(new_A==0) begin
                             next_state <= load_b;
                         end
                     end

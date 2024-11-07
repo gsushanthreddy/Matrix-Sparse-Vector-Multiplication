@@ -29,7 +29,6 @@ module input_mems_fsm #(
                 if (new_A==1) begin
                     wr_en_a = 1;
                     next_state = load_a;
-                    // Akarsh comment: Where to handle output K?
                 end
                 else if(new_A==0) begin
                     wr_en_b = 1;
@@ -41,33 +40,27 @@ module input_mems_fsm #(
             end
         end
         else if (state==load_a) begin
-            if (AXIS_TVALID) begin
-                if (matrix_A_loaded==0) begin
+            if(matrix_A_loaded==0) begin
+                if(AXIS_TVALID) begin
                     wr_en_a = 1;
-                    next_state = load_a;
                 end
-                else begin
-                    wr_en_b = 1;
-                    next_state = load_b;
-                end
-            end
-            else begin
                 next_state = load_a;
+            end
+            else if(matrix_A_loaded==1) begin
+                // wr_en_b = 1;
+                next_state = load_b;
             end
         end
         else if (state==load_b) begin
-            if (AXIS_TVALID) begin
-                if (matrix_B_loaded==0) begin
+            if(matrix_B_loaded==0) begin
+                if(AXIS_TVALID) begin
                     wr_en_b = 1;
-                    next_state = load_b;
                 end
-                else begin
-                    matrices_loaded = 1;
-                    next_state = read;
-                end
-            end
-            else begin
                 next_state = load_b;
+            end
+            else if(matrix_B_loaded==1) begin
+                matrices_loaded = 1;
+                next_state = read;
             end
         end
         else if (state==read) begin
@@ -76,7 +69,6 @@ module input_mems_fsm #(
                 matrices_loaded = 0;
             end
             else begin
-                matrices_loaded = 1;
                 AXIS_TREADY = 0;
                 next_state = read;
             end
