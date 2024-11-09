@@ -1,5 +1,5 @@
-`define INWVAL 24
-`define MVAL 5
-`define NVAL 4
-`define MAXKVAL 6
+`define INWVAL 17
+`define MVAL 6
+`define NVAL 6
+`define MAXKVAL 4
 `define TVPR 0.5

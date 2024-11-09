@@ -1,8 +1,8 @@
 module input_mems #(
     parameter INW = 12,
-    parameter M = 7,
-    parameter N = 9,
-    parameter MAXK = 8,
+    parameter M = 8,
+    parameter N = 11,
+    parameter MAXK = 9,
     localparam K_BITS = $clog2(MAXK+1),
     localparam A_ADDR_BITS = $clog2(M*MAXK),
     localparam B_ADDR_BITS = $clog2(MAXK*N)
@@ -21,10 +21,10 @@ module input_mems #(
     output logic signed [INW-1:0] B_data
 );
 
-    //logic [$clog2(MAXK+1)-1:0] TUSER_K; "made this comment because u=you aded the same logic in fsm"
+    logic [$clog2(MAXK+1)-1:0] TUSER_K; 
     logic new_A;  
 
-    //assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; "made this comment because u=you aded the same logic in fsm" 
+    assign TUSER_K = AXIS_TUSER[$clog2(MAXK+1):1]; 
     assign new_A = AXIS_TUSER[0];
 
     logic wr_en_A;
@@ -35,7 +35,7 @@ module input_mems #(
     logic matrix_B_loaded;
 
     // instantiation of FSM
-    input_mems_fsm #(.MAXK(MAXK)) fsm_inst( //Akarsh comment: Added verify
+    input_mems_fsm #(.MAXK(MAXK)) fsm_inst( 
         .clk(clk),
         .reset(reset),
         .AXIS_TVALID(AXIS_TVALID),
@@ -43,7 +43,7 @@ module input_mems #(
         .new_A(new_A),
         .matrix_A_loaded(matrix_A_loaded),
         .matrix_B_loaded(matrix_B_loaded),
-        .AXIS_TUSER(AXIS_TUSER), //Akarsh comment: Addes, verify once
+        .TUSER_K(TUSER_K),
 
         .matrices_loaded(matrices_loaded),
         .wr_en_a(wr_en_A),

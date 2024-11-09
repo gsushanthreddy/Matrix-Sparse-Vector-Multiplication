@@ -1,8 +1,8 @@
 module input_mems_datapath #(
     parameter INW = 12,
-    parameter M = 7,
-    parameter N = 9,
-    parameter MAXK = 8,
+    parameter M = 8,
+    parameter N = 11,
+    parameter MAXK = 9,
     localparam K_BITS = $clog2(MAXK+1),
     localparam A_ADDR_BITS = $clog2(M*MAXK),
     localparam B_ADDR_BITS = $clog2(MAXK*N)
@@ -42,44 +42,43 @@ module input_mems_datapath #(
     
     // Logic for address counter for 'A'
     always_ff @(posedge clk) begin
-        if(reset) begin
+        if((reset == 1) || (matrix_A_loaded == 1)) begin
             A_write_address <= 0;
-            matrix_A_loaded <= 0;
         end
         else begin
-            if (wr_en_A && AXIS_TVALID) begin
+            if (wr_en_A) begin
                 A_write_address <= A_write_address + 1; 
-                if (A_write_address == (M*K)-1) begin
-                    A_write_address <= 0;
-                    matrix_A_loaded <= 1;
-                end
             end 
-        end
-
-        if (matrices_loaded == 1) begin
-            matrix_A_loaded <= 0;
         end
     end
-    
 
-    // Logic for Adress counter for 'B'
+    always_comb begin
+        if (A_write_address == (M*K)) begin 
+            matrix_A_loaded = 1;
+        end 
+        else begin
+            matrix_A_loaded = 0;
+        end
+    end
+
+    // Logic for address counter for 'B'
     always_ff @(posedge clk) begin
-        if(reset) begin
+        if((reset == 1) || (matrix_B_loaded == 1)) begin
             B_write_address <= 0;
-            matrix_B_loaded <= 0;
         end
         else begin
-            if (wr_en_B && AXIS_TVALID) begin
+            if (wr_en_B) begin
                 B_write_address <= B_write_address + 1; 
-                if (B_write_address == (K*N)-1) begin
-                    B_write_address <= 0;
-                    matrix_B_loaded <= 1;
-                end
             end 
         end
+    end
 
-        if (matrices_loaded == 1) begin
-            matrix_B_loaded <= 0;
+    always_comb begin
+        if (B_write_address == (K*N)) begin
+            matrix_B_loaded = 1;
+        end 
+        else begin
+            matrix_B_loaded = 0;
         end
     end
 
