@@ -1,0 +1,43 @@
+								Status Report for Project Part-3  
+
+Members of the Team:- 
+
+1. Sushanth Reddy Gurram - 115668498
+2. Sai Akarsh Gokavarapu - 115910975 
+
+Project Part-3 :- 
+
+* Part-3 of the project included implementation of Input Memory Module. 
+* Different scenarios under which the implementation was tested using QuestaSim Simulator: 
+	- INW = 24, M = 5, N = 4, MAXK = 6, TVALID_PROB = 0.001 
+	- INW = 24, M = 5, N = 4, MAXK = 6, TVALID_PROB = 0.3 
+	- INW = 24, M = 5, N = 4, MAXK = 6, TVALID_PROB = 0.5 
+	- INW = 24, M = 5, N = 4, MAXK = 6, TVALID_PROB = 0.9 
+	- INW = 24, M = 5, N = 4, MAXK = 6, TVALID_PROB = 0.99 
+
+	- INW = 12, M = 8, N = 11, MAXK = 9, TVALID_PROB = 0.001 
+	- INW = 12, M = 8, N = 11, MAXK = 9, TVALID_PROB = 0.3  
+	- INW = 12, M = 8, N = 11, MAXK = 9, TVALID_PROB = 0.5  
+	- INW = 12, M = 8, N = 11, MAXK = 9, TVALID_PROB = 0.9 
+	- INW = 12, M = 8, N = 11, MAXK = 9, TVALID_PROB = 0.99 
+
+	- INW = 17, M = 6, N = 6, MAXK = 4, TVALID_PROB = 0.001 
+	- INW = 17, M = 6, N = 6, MAXK = 4, TVALID_PROB = 0.3 
+	- INW = 17, M = 6, N = 6, MAXK = 4, TVALID_PROB = 0.5 
+	- INW = 17, M = 6, N = 6, MAXK = 4, TVALID_PROB = 0.9 
+	- INW = 17, M = 6, N = 6, MAXK = 4, TVALID_PROB = 0.99 
+ 
+* Each testcase for different system configurations mentioned above produced 0 errors indicating successful implementation. 
+* Synthesis Summary: 
+
+	- Implemented design was synthesized at (INW = 24, M = 5, N = 4, MAXK = 6) and (INW = 12, M = 8, N = 11, MAXK = 9). 
+
+	- For design at INW = 24, M = 5, N = 4, MAXK = 6:- 
+		* The minimum clock period at which the design met the slack condition is 0.9ns (maximum operational clock frequency = 1.11 Ghz). 
+
+	- For design at INW = 12, M = 8, N = 11, MAXK = 9:- 
+		* The minimum clock period at which the design met the slack condition is 1.2ns (maximum operational clock frequency = 834 Mhz). 
+
+Contributions Made:- 
+
+* Equal contribution has been made by both the teammates in implementing the design, debugging the errors and in estimating maximum operational clock frequency. 
