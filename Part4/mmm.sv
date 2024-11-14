@@ -31,7 +31,7 @@ module MMM #(
     logic compute_finished;
 
 
-    enum {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
+    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
     /* 
         mmm_start => Part4 should wait for Part3 to generate matrices_loaded signal as 1
         read_from_input_memory => After matrices_loaded is set to 1, read addresses should be available from next posedge of clk
@@ -39,7 +39,25 @@ module MMM #(
     */ 
      
     always_comb begin
-        if(state == mmm_start) begin
+        if(reset) begin
+           //initialize the control signals
+           next_state = mmm_start;
+        end
+        else begin
+            if(state == mmm_start) begin
+                //mmm_start logic
+                // if matrices_loaded == 1
+                if(matrices_loaded == 1) begin
+                    // update
+                    next_state = read_from_input_memory;
+                end
+            end
+            else if (state == read_from_input_memory) begin
+                // state 2 logic
+            end
+            else if (state == store_in_fifo) begin
+                //store logic
+            end
         end
     end
 
