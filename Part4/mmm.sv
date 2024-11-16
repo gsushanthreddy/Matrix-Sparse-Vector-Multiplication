@@ -17,9 +17,9 @@ module MMM #(
     input OUTPUT_TREADY
 );
     // logics for counting read address in control logic
-    integer m;
-    integer n;
-    integer k;
+    logic [$clog2(M+1)-1:0] m;
+    logic [$clog2(N+1)-1:0] n;
+    logic [K_BITS-1:0] k; // i am not sure check
 
     logic clear_m, clear_n, clear_k;
     logic increment_k, increment_m, increment_n;
@@ -35,7 +35,7 @@ module MMM #(
     logic [$clog2(M*MAXK)-1:0] A_read_addr;
     logic [$clog2(MAXK*N)-1:0] B_read_addr;
     logic matrices_loaded;
-    logic K;
+    logic [K_BITS-1:0] K;
     logic compute_finished;
     
     // logical connections between mac_pipe and control logic
@@ -44,6 +44,7 @@ module MMM #(
 
     // logical connections between fifo_out and control logic
     logic wr_en_fifo;
+    logic [($clog2(N+1))-1:0] capacity;
 
     // initialising FSM
     enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
@@ -207,7 +208,7 @@ module MMM #(
     );
 
     // instantiating counter for k
-    incrementk (
+    incrementk #(.MAXK(MAXK)) counter_k_inst(
         .clk(clk),
         .reset(reset),
         .increment_k(increment_k),
@@ -216,7 +217,7 @@ module MMM #(
     );
 
     //instantiating counter for m
-    incrementm (
+    incrementm #(.M(M)) counter_m_inst(
         .clk(clk),
         .reset(reset),
         .increment_m(increment_m),
@@ -225,7 +226,7 @@ module MMM #(
     );
 
     //instantiating counter for n
-    incrementn (
+    incrementn #(.N(N)) counter_n_inst(
         .clk(clk),
         .reset(reset),
         .increment_n(increment_n),
@@ -236,11 +237,14 @@ module MMM #(
 endmodule
 
 // counter logic for K
-module incrementk(
+module incrementk #(
+    parameter MAXK = 8,
+    localparam K_BITS = $clog2(MAXK+1)
+)(
     input clk, reset,
     input logic increment_k,
     input logic clear_k,
-    output logic k
+    output logic [K_BITS-1:0] k // i am not sure check
 );
     always_ff @(posedge clk) begin
         if(reset || clear_k) begin
@@ -255,11 +259,13 @@ module incrementk(
 endmodule
 
 // counter logic for M
-module incrementm(
+module incrementm #(
+    parameter M = 7
+)(
     input clk, reset,
     input logic increment_m,
     input logic clear_m,
-    output logic m
+    output logic [$clog2(M+1)-1:0] m
 );
     always_ff @(posedge clk) begin
         if(reset || clear_m) begin
@@ -274,11 +280,13 @@ module incrementm(
 endmodule
 
 // counter logic for N
-module incrementn(
+module incrementn #(
+    parameter N = 9
+)(
     input clk, reset,
     input logic increment_n,
     input logic clear_n,
-    output logic n
+    output logic [$clog2(N+1)-1:0] n
 );
     always_ff @(posedge clk) begin
         if(reset || clear_n) begin
