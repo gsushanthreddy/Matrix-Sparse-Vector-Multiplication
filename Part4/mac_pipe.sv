@@ -1,16 +1,16 @@
 module mac_pipe #(
     parameter INW = 16,
-    parameter OUTW = 48,
+    parameter OUTW = 64,
     localparam MINVAL = (64'd1<<(OUTW-1)),
     localparam MAXVAL = (64'd1<<(OUTW-1))-1
 )(
     input signed [INW-1:0]          in0,
     input signed [INW-1:0]          in1,
-    input                           valid_input,
-    input                           clear_acc,
-    input                           reset,
+    output logic signed [OUTW-1:0]  out,
     input                           clk,
-    output logic signed [OUTW-1:0]  out
+    input                           reset,
+    input                           clear_acc,
+    input                           valid_input
 );
 
     logic signed [2*INW-1:0]    mult_out;
@@ -30,7 +30,7 @@ module mac_pipe #(
         end
         else begin
             pipe_line_rg_out <= mult_out;
-            enable_out_register <= valid_input;
+            enable_out_register <= valid_input; // passing valid_input signal through pipelined register to enable port of accumulate register
         end
     end
 
@@ -55,7 +55,6 @@ module mac_pipe #(
     begin 
         if(reset || clear_acc) begin
             out <= 0;
-            enable_out_register <= 0;
         end
         else if(enable_out_register) begin
             out <= add_out;
