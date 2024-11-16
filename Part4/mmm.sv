@@ -217,7 +217,7 @@ module MMM #(
     );
 
     //instantiating counter for m
-    incrementm (
+    incrementm #(.M(M)) m_counter_inst(
         .clk(clk),
         .reset(reset),
         .increment_m(increment_m),
@@ -226,7 +226,7 @@ module MMM #(
     );
 
     //instantiating counter for n
-    incrementn (
+    incrementn #(.N(N)) n_counter_inst(
         .clk(clk),
         .reset(reset),
         .increment_n(increment_n),
