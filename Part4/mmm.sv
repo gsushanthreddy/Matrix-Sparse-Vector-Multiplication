@@ -16,22 +16,24 @@ module MMM #(
     output OUTPUT_TVALID,
     input OUTPUT_TREADY
 );
-    integer A_ADDR_BITS = $clog2(M*MAXK);
-    integer B_ADDR_BITS = $clog2(MAXK*N);
-    integer m,
+    integer m;
     integer n;
     integer k;
 
-    logic [A_ADDR_BITS-1:0] A_read_addr;
-    logic [B_ADDR_BITS-1:0] B_read_addr;
+    logic [$clog2(M*MAXK)-1:0] A_read_addr;
+    logic [$clog2(MAXK*N)-1:0] B_read_addr;
     logic matrices_loaded;
     logic clear_acc;
     logic valid_input;
     logic wr_en_fifo;
     logic compute_finished;
 
+    logic K;
 
-    enum logic {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
+    logic clear_m, clear_n, clear_k;
+    logic increment_k, increment_m, increment_n;
+
+    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
   
     always_comb begin
         if(reset) begin
@@ -68,6 +70,7 @@ module MMM #(
                 end
             end
             else if (state == store_in_fifo) begin
+                valid_input = 1;
                 wr_en_fifo = 1;
                 if(n<N) begin
                     increment_n = 1;
@@ -87,7 +90,7 @@ module MMM #(
         end
     end
 
-    always_ff begin
+    always_ff @(posedge clk) begin
         if(reset) begin
             state <= mmm_start;
         end
@@ -96,13 +99,15 @@ module MMM #(
         end
     end
 
+    // input_mems, fifo_out and mac_pipe instantiation required
+
 endmodule
 
 module incrementk(
-    input clk, reset;
-    input logic increment_k;
-    input logic clear_k;
-    output logic k;
+    input clk, reset,
+    input logic increment_k,
+    input logic clear_k,
+    output logic k
 );
     always_ff @(posedge clk) begin
         if(reset || clear_k) begin
@@ -117,10 +122,10 @@ module incrementk(
 endmodule
 
 module incrementm(
-    input clk, reset;
-    input logic increment_m;
-    input logic clear_m;
-    output logic m;
+    input clk, reset,
+    input logic increment_m,
+    input logic clear_m,
+    output logic m
 );
     always_ff @(posedge clk) begin
         if(reset || clear_m) begin
@@ -135,17 +140,17 @@ module incrementm(
 endmodule
 
 module incrementn(
-    input clk, reset;
-    input logic increment_n;
-    input logic clear_n;
-    output logic n;
+    input clk, reset,
+    input logic increment_n,
+    input logic clear_n,
+    output logic n
 );
     always_ff @(posedge clk) begin
         if(reset || clear_n) begin
             n <= 0;
         end
         else begin
-            if(increment_k) begin
+            if(increment_n) begin
                 n <= n + 1;
             end
         end
