@@ -50,22 +50,53 @@ module MMM #(
                 clear_k = 1;
                 if(matrices_loaded == 1) begin
                     next_state = read_from_input_memory;
+                    increment_k = 0;
+                    increment_m = 0;
+                    increment_n = 0;
+
+                    valid_input = 0;
+                    wr_en_fifo = 0;
                 end
                 else begin
                     next_state = mmm_start;
+                    increment_k = 0;
+                    increment_m = 0;
+                    increment_n = 0;
+                    
+                    valid_input = 0;
+                    wr_en_fifo = 0;
                 end
             end
             else if (state == read_from_input_memory) begin
                 if(k<K) begin
                     A_read_addr = m*K + k;
                     B_read_addr = k*N + n;
+
                     increment_k = 1;
                     increment_m = 0;
                     increment_n = 0;
+
+                    valid_input = 0;
+                    wr_en_fifo = 0;
+
+                    clear_m = 0;
+                    clear_n = 0;
+                    clear_k = 0;
+
                     next_state = read_from_input_memory;
                 end
                 else begin
+                    increment_k = 0;
+                    increment_m = 0;
+                    increment_n = 0;
+
+                    valid_input = 0;
+                    wr_en_fifo = 0;
+
+                    clear_m = 0;
+                    clear_n = 0;
                     clear_k = 1;
+
                     next_state = store_in_fifo;
                 end
             end
@@ -73,17 +104,39 @@ module MMM #(
                 valid_input = 1;
                 wr_en_fifo = 1;
                 if(n<N) begin
+                    increment_k = 0;
+                    increment_m = 0;
                     increment_n = 1;
+
+                    clear_m = 0;
+                    clear_n = 0;
+                    clear_k = 0;
+
                     next_state = read_from_input_memory;
                 end
                 else if(m<M) begin
-                    clear_n = 1;
+                    increment_k = 0;
                     increment_m = 1;
+                    increment_n = 0;
+
+                    clear_m = 0;
+                    clear_n = 1;
+                    clear_k = 0;
+
                     next_state = read_from_input_memory;
                 end
                 else begin
                     A_read_addr = m*K + k;
                     B_read_addr = k*N + n;
+
+                    increment_k = 0;
+                    increment_m = 0;
+                    increment_n = 0;
+
+                    clear_m = 0;
+                    clear_n = 0;
+                    clear_k = 0;
+
                     next_state = mmm_start;
                 end
             end
@@ -156,3 +209,4 @@ module incrementn(
         end
     end
 endmodule
+
