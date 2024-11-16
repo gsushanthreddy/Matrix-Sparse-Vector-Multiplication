@@ -217,21 +217,21 @@ module MMM #(
     );
 
     //instantiating counter for m
-    incrementm #(.M(M)) counter_m_inst(
+    incrementm (
         .clk(clk),
         .reset(reset),
         .increment_m(increment_m),
         .clear_m(clear_m),
-        .m(m),
+        .m(m)
     );
 
     //instantiating counter for n
-    incrementn #(.N(N)) counter_n_inst(
+    incrementn (
         .clk(clk),
         .reset(reset),
         .increment_n(increment_n),
         .clear_n(clear_n),
-        .n(n),
+        .n(n)
     );
 
 endmodule
