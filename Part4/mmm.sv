@@ -51,40 +51,83 @@ module MMM #(
   
     always_comb begin
         if(reset) begin
-           next_state = mmm_start;
-           clear_acc = 1;
-           valid_input = 0;
-           wr_en_fifo = 0;
-           compute_finished = 1;
+            next_state = mmm_start;
+            clear_acc = 1;
+            valid_input = 0;
+            wr_en_fifo = 0;
+            compute_finished = 1;
+
+            A_read_addr = 'bx;
+            B_read_addr = 'bx;
+
+            increment_k = 0;
+            increment_m = 0;
+            increment_n = 0;
+            
+            clear_m = 1;
+            clear_n = 1;
+            clear_k = 1;
         end
         else begin
             if(state == mmm_start) begin
-                clear_m = 1;
-                clear_n = 1;
-                clear_k = 1;
                 if(matrices_loaded == 1) begin
                     next_state = read_from_input_memory;
-                    increment_k = 0;
+                    clear_m = 1;
+                    clear_n = 1;
+                    clear_k = 0;
+
+                    increment_k = 1;
                     increment_m = 0;
                     increment_n = 0;
 
-                    valid_input = 0;
+                    valid_input = 1;
                     wr_en_fifo = 0;
+                    compute_finished = 0;
+                    
+                    A_read_addr = 0;
+                    B_read_addr = 0;
                 end
                 else begin
                     next_state = mmm_start;
+                    clear_m = 1;
+                    clear_n = 1;
+                    clear_k = 1;
+
                     increment_k = 0;
                     increment_m = 0;
                     increment_n = 0;
                     
                     valid_input = 0;
                     wr_en_fifo = 0;
+                    compute_finished = 1;
+
+                    A_read_addr = 'bx;
+                    B_read_addr = 'bx;
                 end
             end
             else if (state == read_from_input_memory) begin
+                clear_acc = 0;
+                compute_finished = 0;
                 if(k<K) begin
+                    valid_input = 1;
+                    wr_en_fifo = 0;
+
+                    clear_m = 0;
+                    clear_n = 0;
+                    clear_k = 0;
+
                     A_read_addr = m*K + k;
                     B_read_addr = k*N + n;
+
+                    increment_k = 1;
+                    increment_m = 0;
+                    increment_n = 0;
+
+                    next_state = read_from_input_memory;
+                end
+                else if(k==K) begin
+                    A_read_addr = 'bx;
+                    B_read_addr = 'bx;
 
                     increment_k = 1;
                     increment_m = 0;
@@ -100,6 +143,8 @@ module MMM #(
                     next_state = read_from_input_memory;
                 end
                 else begin
+                    A_read_addr = 'bx;
+                    B_read_addr = 'bx;
                     increment_k = 0;
                     increment_m = 0;
                     increment_n = 0;
@@ -109,14 +154,22 @@ module MMM #(
 
                     clear_m = 0;
                     clear_n = 0;
-                    clear_k = 1;
-
-                    next_state = store_in_fifo;
+                    if(capacity != 0) begin
+                        clear_k = 1;
+                        next_state = store_in_fifo;
+                    end
+                    else begin
+                        clear_k = 0;
+                        next_state = read_from_input_memory;
+                    end
                 end
             end
             else if (state == store_in_fifo) begin
-                valid_input = 1;
+                compute_finished = 0;
+                valid_input = 0;
                 wr_en_fifo = 1;
+                A_read_addr = 'bx;
+                B_read_addr = 'bx;
                 if(n<N) begin
                     increment_k = 0;
                     increment_m = 0;
@@ -150,7 +203,8 @@ module MMM #(
                     clear_m = 0;
                     clear_n = 0;
                     clear_k = 0;
-
+                    
+                    compute_finished = 1;
                     next_state = mmm_start;
                 end
             end
@@ -200,7 +254,7 @@ module MMM #(
         .clk(clk),
         .reset(reset),
         .data_in(output_from_mac),
-        .wr_en(wr_en),
+        .wr_en(wr_en_fifo),
         .capacity(capacity),
         .AXIS_TDATA(OUTPUT_TDATA),
         .AXIS_TVALID(OUTPUT_TVALID),
