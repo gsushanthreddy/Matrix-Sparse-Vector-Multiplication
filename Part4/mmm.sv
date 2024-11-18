@@ -57,8 +57,8 @@ module MMM #(
             wr_en_fifo = 0;
             compute_finished = 1;
 
-            A_read_addr = 'bx;
-            B_read_addr = 'bx;
+            // A_read_addr = 'bx;
+            // B_read_addr = 'bx;
 
             increment_k = 0;
             increment_m = 0;
@@ -84,8 +84,8 @@ module MMM #(
                     wr_en_fifo = 0;
                     compute_finished = 0;
                     
-                    A_read_addr = 0;
-                    B_read_addr = 0;
+                    // A_read_addr = 0;
+                    // B_read_addr = 0;
                 end
                 else begin
                     next_state = mmm_start;
@@ -101,8 +101,8 @@ module MMM #(
                     wr_en_fifo = 0;
                     compute_finished = 1;
 
-                    A_read_addr = 'bx;
-                    B_read_addr = 'bx;
+                    // A_read_addr = 'bx;
+                    // B_read_addr = 'bx;
                 end
             end
             else if (state == read_from_input_memory) begin
@@ -116,8 +116,8 @@ module MMM #(
                     clear_n = 0;
                     clear_k = 0;
 
-                    A_read_addr = m*K + k;
-                    B_read_addr = k*N + n;
+                    // A_read_addr = m*K + k;
+                    // B_read_addr = k*N + n;
 
                     increment_k = 1;
                     increment_m = 0;
@@ -126,8 +126,8 @@ module MMM #(
                     next_state = read_from_input_memory;
                 end
                 else if(k==K) begin
-                    A_read_addr = 'bx;
-                    B_read_addr = 'bx;
+                    // A_read_addr = 'bx;
+                    // B_read_addr = 'bx;
 
                     increment_k = 1;
                     increment_m = 0;
@@ -143,8 +143,8 @@ module MMM #(
                     next_state = read_from_input_memory;
                 end
                 else begin
-                    A_read_addr = 'bx;
-                    B_read_addr = 'bx;
+                    // A_read_addr = 'bx;
+                    // B_read_addr = 'bx;
                     increment_k = 0;
                     increment_m = 0;
                     increment_n = 0;
@@ -168,8 +168,8 @@ module MMM #(
                 compute_finished = 0;
                 valid_input = 0;
                 wr_en_fifo = 1;
-                A_read_addr = 'bx;
-                B_read_addr = 'bx;
+                // A_read_addr = 'bx;
+                // B_read_addr = 'bx;
                 if(n<N) begin
                     increment_k = 0;
                     increment_m = 0;
@@ -193,8 +193,8 @@ module MMM #(
                     next_state = read_from_input_memory;
                 end
                 else begin
-                    A_read_addr = m*K + k;
-                    B_read_addr = k*N + n;
+                    // A_read_addr = m*K + k;
+                    // B_read_addr = k*N + n;
 
                     increment_k = 0;
                     increment_m = 0;
@@ -217,6 +217,17 @@ module MMM #(
         end
         else begin
             state <= next_state;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if(state == mmm_start) begin
+            A_read_addr <= 0;
+            B_read_addr <= 0;
+        end
+        else if(state == read_from_input_memory) begin
+            A_read_addr <= m*K + k;
+            B_read_addr <= k*N + n;
         end
     end
     
