@@ -249,6 +249,10 @@ module input_mems_datapath #(
     logic [A_ADDR_BITS-1:0] A_address;
     logic [B_ADDR_BITS-1:0] B_address;
 
+    // Fix for the issue with part 3 submission
+    logic [A_ADDR_BITS:0] A_write_address_check;
+    logic [B_ADDR_BITS:0] B_write_address_check;
+
     logic signed [INW-1:0] A_data_out;
     logic signed [INW-1:0] B_data_out;
 
@@ -257,16 +261,18 @@ module input_mems_datapath #(
     always_ff @(posedge clk) begin
         if((reset == 1) || (matrix_A_loaded == 1)) begin
             A_write_address <= 0;
+            A_write_address_check <= 0;
         end
         else begin
             if (wr_en_A) begin
-                A_write_address <= A_write_address + 1; 
+                A_write_address <= A_write_address + 1;
+                A_write_address_check <= A_write_address_check + 1; 
             end 
         end
     end
 
     always_comb begin
-        if (A_write_address == (M*K)) begin 
+        if (A_write_address_check == (M*K)) begin 
             matrix_A_loaded = 1;
         end 
         else begin
@@ -278,16 +284,18 @@ module input_mems_datapath #(
     always_ff @(posedge clk) begin
         if((reset == 1) || (matrix_B_loaded == 1)) begin
             B_write_address <= 0;
+            B_write_address_check <= 0;
         end
         else begin
             if (wr_en_B) begin
                 B_write_address <= B_write_address + 1; 
+                B_write_address_check <= B_write_address_check + 1;
             end 
         end
     end
 
     always_comb begin
-        if (B_write_address == (K*N)) begin
+        if (B_write_address_check == (K*N)) begin
             matrix_B_loaded = 1;
         end 
         else begin
