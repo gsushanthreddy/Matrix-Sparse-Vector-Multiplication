@@ -1,8 +1,8 @@
 module MMM #(
     parameter INW = 12,
-    parameter OUTW = 32,
-    parameter M = 7,
-    parameter N = 9,
+    parameter OUTW = 36,
+    parameter M = 6,
+    parameter N = 11,
     parameter MAXK = 8,
     localparam K_BITS = $clog2(MAXK+1)
 )(
@@ -19,8 +19,7 @@ module MMM #(
     // logics for counting read address in control logic
     logic [$clog2(M+1)-1:0] m;
     logic [$clog2(N+1)-1:0] n;
-    logic [K_BITS-1:0] k; // i am not sure check
-
+    logic [K_BITS-1:0] k; 
     logic clear_m, clear_n, clear_k;
     logic increment_k, increment_m, increment_n;
     
@@ -49,187 +48,89 @@ module MMM #(
     // initialising FSM
     enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
   
-    always_comb begin
+    always_ff @(posedge clk) begin
         if(reset) begin
-            next_state = mmm_start;
-            clear_acc = 1;
-            valid_input = 0;
-            wr_en_fifo = 0;
-            compute_finished = 1;
-
-            // A_read_addr = 'bx;
-            // B_read_addr = 'bx;
-
-            increment_k = 0;
-            increment_m = 0;
-            increment_n = 0;
-            
-            clear_m = 1;
-            clear_n = 1;
-            clear_k = 1;
+            state <= mmm_start;
+            k <= 0;
+            m <= 0;
+            n <= 0;
+            compute_finished <= 1;
+            valid_input <= 0;
+            clear_acc <= 1;
         end
         else begin
             if(state == mmm_start) begin
                 if(matrices_loaded == 1) begin
-                    next_state = read_from_input_memory;
-                    clear_m = 1;
-                    clear_n = 1;
-                    clear_k = 0;
-
-                    increment_k = 1;
-                    increment_m = 0;
-                    increment_n = 0;
-
-                    valid_input = 1;
-                    wr_en_fifo = 0;
-                    compute_finished = 0;
-                    
-                    // A_read_addr = 0;
-                    // B_read_addr = 0;
-                end
-                else begin
-                    next_state = mmm_start;
-                    clear_m = 1;
-                    clear_n = 1;
-                    clear_k = 1;
-
-                    increment_k = 0;
-                    increment_m = 0;
-                    increment_n = 0;
-                    
-                    valid_input = 0;
-                    wr_en_fifo = 0;
-                    compute_finished = 1;
-
-                    // A_read_addr = 'bx;
-                    // B_read_addr = 'bx;
+                    state <= read_from_input_memory;
+                    compute_finished <= 0;
+                    valid_input <= 0;
+                    clear_acc <= 1;
                 end
             end
-            else if (state == read_from_input_memory) begin
-                clear_acc = 0;
-                compute_finished = 0;
-                if(k<K) begin
-                    valid_input = 1;
-                    wr_en_fifo = 0;
-
-                    clear_m = 0;
-                    clear_n = 0;
-                    clear_k = 0;
-
-                    // A_read_addr = m*K + k;
-                    // B_read_addr = k*N + n;
-
-                    increment_k = 1;
-                    increment_m = 0;
-                    increment_n = 0;
-
-                    next_state = read_from_input_memory;
+            else if(state == read_from_input_memory) begin
+                if(k==1) begin
+                   valid_input <= 1; 
                 end
-                else if(k==K) begin
-                    // A_read_addr = 'bx;
-                    // B_read_addr = 'bx;
-
-                    increment_k = 1;
-                    increment_m = 0;
-                    increment_n = 0;
-
-                    valid_input = 0;
-                    wr_en_fifo = 0;
-
-                    clear_m = 0;
-                    clear_n = 0;
-                    clear_k = 0;
-
-                    next_state = read_from_input_memory;
+                else if(k == K+1) begin
+                    valid_input <= 0;
+                end
+                if(k==2) begin
+                    clear_acc <= 0;
+                end
+                if(k<K) begin
+                    A_read_addr <= m*K + k;
+                    B_read_addr <= k*N + n;
+                    k <= k+1;
                 end
                 else begin
-                    // A_read_addr = 'bx;
-                    // B_read_addr = 'bx;
-                    increment_k = 0;
-                    increment_m = 0;
-                    increment_n = 0;
-
-                    valid_input = 0;
-                    wr_en_fifo = 0;
-
-                    clear_m = 0;
-                    clear_n = 0;
-                    if(capacity != 0) begin
-                        clear_k = 1;
-                        next_state = store_in_fifo;
+                    if(k == K+3) begin
+                        state <= store_in_fifo;
+                        k <= 0;
                     end
                     else begin
-                        clear_k = 0;
-                        next_state = read_from_input_memory;
+                        state <= read_from_input_memory;
+                        k <= k + 1;
                     end
                 end
             end
-            else if (state == store_in_fifo) begin
-                compute_finished = 0;
-                valid_input = 0;
-                wr_en_fifo = 1;
-                // A_read_addr = 'bx;
-                // B_read_addr = 'bx;
-                if(n<N) begin
-                    increment_k = 0;
-                    increment_m = 0;
-                    increment_n = 1;
-
-                    clear_m = 0;
-                    clear_n = 0;
-                    clear_k = 0;
-
-                    next_state = read_from_input_memory;
-                end
-                else if(m<M) begin
-                    increment_k = 0;
-                    increment_m = 1;
-                    increment_n = 0;
-
-                    clear_m = 0;
-                    clear_n = 1;
-                    clear_k = 0;
-
-                    next_state = read_from_input_memory;
-                end
-                else begin
-                    // A_read_addr = m*K + k;
-                    // B_read_addr = k*N + n;
-
-                    increment_k = 0;
-                    increment_m = 0;
-                    increment_n = 0;
-
-                    clear_m = 0;
-                    clear_n = 0;
-                    clear_k = 0;
-                    
-                    compute_finished = 1;
-                    next_state = mmm_start;
+            else if(state == store_in_fifo) begin
+                if(capacity != 0) begin
+                    if(n<N-1) begin
+                        n <= n + 1;
+                        clear_acc <= 1;
+                        state <= read_from_input_memory;
+                    end
+                    else if(m<M-1) begin
+                        n <= 0;
+                        m <= m + 1;
+                        clear_acc <= 1;
+                        state <= read_from_input_memory;
+                    end
+                    else begin
+                        state <= mmm_start;
+                        m <= 0;
+                        n <= 0;
+                        k <= 0;
+                        compute_finished <= 1;
+                    end
                 end
             end
         end
     end
 
-    always_ff @(posedge clk) begin
-        if(reset) begin
-            state <= mmm_start;
+    always_comb begin
+        wr_en_fifo = 0;
+        if(state == mmm_start) begin
+            wr_en_fifo = 0;
         end
-        else begin
-            state <= next_state;
+        else if(state == read_from_input_memory) begin
+            wr_en_fifo = 0;
+        end
+        else if(capacity != 0 && state == store_in_fifo) begin
+            wr_en_fifo = 1;
         end
     end
 
-    always_ff @(posedge clk) begin
-        if(state == mmm_start) begin
-            A_read_addr <= 0;
-            B_read_addr <= 0;
-        end
-        else if(state == read_from_input_memory) begin
-            A_read_addr <= m*K + k;
-            B_read_addr <= k*N + n;
-        end
-    end
     
     // Instantiating input memories unit
     input_mems #(.INW(INW), .M(M), .N(N), .MAXK(MAXK)) input_memories_inst(
@@ -272,96 +173,5 @@ module MMM #(
         .AXIS_TREADY(OUTPUT_TREADY)
     );
 
-    // instantiating counter for k
-    incrementk #(.MAXK(MAXK)) counter_k_inst(
-        .clk(clk),
-        .reset(reset),
-        .increment_k(increment_k),
-        .clear_k(clear_k),
-        .k(k)
-    );
-
-    //instantiating counter for m
-    incrementm #(.M(M)) m_counter_inst(
-        .clk(clk),
-        .reset(reset),
-        .increment_m(increment_m),
-        .clear_m(clear_m),
-        .m(m)
-    );
-
-    //instantiating counter for n
-    incrementn #(.N(N)) n_counter_inst(
-        .clk(clk),
-        .reset(reset),
-        .increment_n(increment_n),
-        .clear_n(clear_n),
-        .n(n)
-    );
-
-endmodule
-
-// counter logic for K
-module incrementk #(
-    parameter MAXK = 8,
-    localparam K_BITS = $clog2(MAXK+1)
-)(
-    input clk, reset,
-    input logic increment_k,
-    input logic clear_k,
-    output logic [K_BITS-1:0] k // i am not sure check
-);
-    always_ff @(posedge clk) begin
-        if(reset || clear_k) begin
-            k <= 0;
-        end
-        else begin
-            if(increment_k) begin
-                k <= k + 1;
-            end
-        end
-    end
-endmodule
-
-// counter logic for M
-module incrementm #(
-    parameter M = 7
-)(
-    input clk, reset,
-    input logic increment_m,
-    input logic clear_m,
-    output logic [$clog2(M+1)-1:0] m
-);
-    always_ff @(posedge clk) begin
-        if(reset || clear_m) begin
-            m <= 0;
-        end
-        else begin
-            if(increment_m) begin
-                m <= m + 1;
-            end
-        end
-    end
-endmodule
-
-// counter logic for N
-module incrementn #(
-    parameter N = 9
-)(
-    input clk, reset,
-    input logic increment_n,
-    input logic clear_n,
-    output logic [$clog2(N+1)-1:0] n
-);
-    always_ff @(posedge clk) begin
-        if(reset || clear_n) begin
-            n <= 0;
-        end
-        else begin
-            if(increment_n) begin
-                n <= n + 1;
-            end
-        end
-    end
 endmodule
 
