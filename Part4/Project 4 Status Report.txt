@@ -1,0 +1,80 @@
+								Status Report for Project Part-4  
+
+Members of the Team:- 
+
+1. Sushanth Reddy Gurram - 115668498
+2. Sai Akarsh Gokavarapu - 115910975 
+
+Project Part-4 :- 
+
+* Part-4 of the project included implementation of Matrix-Matrix Multiplier(MMM). 
+* Different scenarios under which the implementation was tested using QuestaSim Simulator: 
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.001, TREADY_PROB = 0.001
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.3, TREADY_PROB = 0.3
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.2 
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.75, TREADY_PROB = 0.9 
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.1 
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.9, TREADY_PROB = 0.5 
+	- INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.99, TREADY_PROB = 0.99
+
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.001, TREADY_PROB = 0.001 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.3, TREADY_PROB = 0.3 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.2 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.75, TREADY_PROB = 0.9 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.1 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.9, TREADY_PROB = 0.5 
+	- INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8, TVALID_PROB = 0.99, TREADY_PROB = 0.99 
+
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.001, TREADY_PROB = 0.001 
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.3, TREADY_PROB = 0.3 
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.5, TREADY_PROB = 0.2 
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.75, TREADY_PROB = 0.9 
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.5, TREADY_PROB = 0.1
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.9, TREADY_PROB = 0.5 
+	- INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20, TVALID_PROB = 0.99, TREADY_PROB = 0.99 
+
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.001, TREADY_PROB = 0.001
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.3, TREADY_PROB = 0.3 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.5, TREADY_PROB = 0.2 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.75, TREADY_PROB = 0.9
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.5, TREADY_PROB = 0.1 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.9, TREADY_PROB = 0.5 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 16, TVALID_PROB = 0.99, TREADY_PROB = 0.99
+
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.001, TREADY_PROB = 0.001 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.3, TREADY_PROB = 0.3 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.2 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.75, TREADY_PROB = 0.9 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.5, TREADY_PROB = 0.1 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.9, TREADY_PROB = 0.5 
+	- INW = 32, OUTW = 64, M = 8, N = 16, MAXK = 8, TVALID_PROB = 0.99, TREADY_PROB = 0.99 
+
+	 
+ 
+* Each testcase for different system configurations mentioned above produced 0 errors indicating successful implementation. 
+
+* Synthesis Summary: 
+
+	- Implemented design was synthesized at (INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8) and (INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8) and (INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20). 
+
+	- For design at INW = 12, OUTW = 36, M = 6, N = 11, MAXK = 8:- 
+		* The minimum clock period at which the design met the slack condition is 1.5ns (maximum operational clock frequency = 667 Mhz). 
+
+	- For design at INW = 18, OUTW = 48, M = 6, N = 11, MAXK = 8:- 
+		* The minimum clock period at which the design met the slack condition is 1.7ns (maximum operational clock frequency = 589 Mhz). 
+
+	- For design at INW = 24, OUTW = 64, M = 17, N = 15, MAXK = 20:- 
+		* The minimum clock period at which the design met the slack condition is 1.8ns (maximum operational clock frequency = 556 Mhz). 
+
+* Changes made:
+
+Part 1: mac_pipe unit
+        - As per your suggestion, removed minus infront of MINVAL logic in handling saturation, as its not required.
+
+Part 3: input_mems unit
+        - In previous submision our design is not working for the cases where (N*MAXK) or (M*MAXK) is a power of two. We are facing this issue because we are assigning less number of address bits. 
+        - So we updated our logic for generating status signals matrix_A_loaded and matrix_B_loaded. We have created two new logics [A_write_address_check, B_write_address_check] which checks the last value to be loaded into the two input memories and generate [matrix_A_loaded, matrix_B_loaded] signals respectively. 
+ 
+Contributions Made:- 
+
+* Equal contribution has been made by both the teammates in implementing the design, debugging the errors and in estimating maximum operational clock frequency. 
