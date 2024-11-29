@@ -46,7 +46,7 @@ module MMM #(
     logic [($clog2(N+1))-1:0] capacity;
 
     // initialising FSM
-    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
+    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state; //removed next state which is not required
   
     always_ff @(posedge clk) begin
         if(reset) begin
