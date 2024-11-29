@@ -17,9 +17,9 @@ module MMM #(
     input OUTPUT_TREADY
 );
     // logics for counting read address in control logic
-    logic [$clog2(M+1)-1:0] m;
-    logic [$clog2(N+1)-1:0] n;
-    logic [K_BITS-1:0] k; 
+    logic [$clog2(M+1):0] m; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
+    logic [$clog2(N+1):0] n; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
+    logic [K_BITS:0] k; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
     logic clear_m, clear_n, clear_k;
     logic increment_k, increment_m, increment_n;
     
@@ -68,13 +68,13 @@ module MMM #(
                 end
             end
             else if(state == read_from_input_memory) begin
-                if(k==3) begin  // updated k==1 to k==3 as akarsh added two stage pipelined multilier
+                if(k==2) begin  // updated k==1 to k==2 as akarsh added two stage pipelined multilier
                    valid_input <= 1; 
                 end
-                else if(k == K+3) begin // updated k==K+1 to k==K+3 as akarsh added two stage pipelined multilier
+                else if(k == K+2) begin // updated k==K+1 to k==K+2 as akarsh added two stage pipelined multilier
                     valid_input <= 0;
                 end
-                if(k==4) begin     // updated k==2 to k==4 as akarsh added two stage pipelined multilier
+                if(k==3) begin     // updated k==2 to k==3 as akarsh added two stage pipelined multilier
                     clear_acc <= 0;
                 end
                 if(k<K) begin
@@ -83,7 +83,7 @@ module MMM #(
                     k <= k+1;
                 end
                 else begin
-                    if(k == K+5) begin // updated k==K+3 to k==K+5 as akarsh added two stage pipelined multilier
+                    if(k == K+4) begin // updated k==K+3 to k==K+4 as akarsh added two stage pipelined multilier
                         state <= store_in_fifo;
                         k <= 0;
                     end
