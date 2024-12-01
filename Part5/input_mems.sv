@@ -256,6 +256,17 @@ module input_mems_datapath #(
     logic signed [INW-1:0] A_data_out;
     logic signed [INW-1:0] B_data_out;
 
+    // trying new logic to break down critical path
+    logic [A_ADDR_BITS:0] A_matrix_size;
+    logic [B_ADDR_BITS:0] B_matrix_size;
+
+    //Computing Matrix sizes
+    always_ff @(posedge clk) begin
+        A_matrix_size <= M*K;
+        B_matrix_size <= K*N;
+    end
+    //critical path logic ended and made small change in comparator
+
     
     // Logic for address counter for 'A'
     always_ff @(posedge clk) begin
@@ -272,7 +283,7 @@ module input_mems_datapath #(
     end
 
     always_comb begin
-        if (A_write_address_check == (M*K)) begin 
+        if (A_write_address_check ==  A_matrix_size/*(M*K)*/) begin 
             matrix_A_loaded = 1;
         end 
         else begin
@@ -295,7 +306,7 @@ module input_mems_datapath #(
     end
 
     always_comb begin
-        if (B_write_address_check == (K*N)) begin
+        if (B_write_address_check == B_matrix_size/*(K*N)*/) begin
             matrix_B_loaded = 1;
         end 
         else begin

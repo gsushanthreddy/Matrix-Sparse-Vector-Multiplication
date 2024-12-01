@@ -68,13 +68,13 @@ module MMM #(
                 end
             end
             else if(state == read_from_input_memory) begin
-                if(k==2) begin  // updated k==1 to k==2 as akarsh added two stage pipelined multilier
+                if(k==4) begin  // updated k==1 to k==4 as akarsh added 4 stage pipelined multilier
                    valid_input <= 1; 
                 end
-                else if(k == K+2) begin // updated k==K+1 to k==K+2 as akarsh added two stage pipelined multilier
+                else if(k == K+4) begin // updated k==K+1 to k==K+4 as akarsh added 4 stage pipelined multilier
                     valid_input <= 0;
                 end
-                if(k==3) begin     // updated k==2 to k==3 as akarsh added two stage pipelined multilier
+                if(k==5) begin     // updated k==2 to k==5 as akarsh added 4 stage pipelined multilier
                     clear_acc <= 0;
                 end
                 if(k<K) begin
@@ -83,7 +83,7 @@ module MMM #(
                     k <= k+1;
                 end
                 else begin
-                    if(k == K+4) begin // updated k==K+3 to k==K+4 as akarsh added two stage pipelined multilier
+                    if(k == K+6) begin // updated k==K+3 to k==K+6 as akarsh added 4 stage pipelined multilier
                         state <= store_in_fifo;
                         k <= 0;
                     end

@@ -19,7 +19,7 @@ module MMM #(
     // logics for counting read address in control logic
     logic [$clog2(M+1)-1:0] m;
     logic [$clog2(N+1)-1:0] n;
-    logic [K_BITS-1:0] k; 
+    logic [K_BITS:0] k; // made a change
     logic clear_m, clear_n, clear_k;
     logic increment_k, increment_m, increment_n;
     
