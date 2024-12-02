@@ -65,16 +65,27 @@ module MMM #(
                     compute_finished <= 0;
                     valid_input <= 0;
                     clear_acc <= 1;
+                    
+                    //updated logic to make fsm faster
+                    A_read_addr <= 0;
+                    B_read_addr <= 0;
+                    k <= k+1;
+                    // changed logic ends here
                 end
             end
-            else if(state == read_from_input_memory) begin
-                if(k==1) begin
-                   valid_input <= 1; 
+            else if(state == read_from_input_memory) begin 
+                //updated logic to make fsm faster
+                if(k <= K) begin
+                    if(k > 0) begin
+                        valid_input <= 1;
+                    end
                 end
-                else if(k == K+1) begin
+                else begin
                     valid_input <= 0;
                 end
-                if(k==2) begin
+                //changed logic ends here
+    
+                if(k==1) begin
                     clear_acc <= 0;
                 end
                 if(k<K) begin
@@ -83,7 +94,7 @@ module MMM #(
                     k <= k+1;
                 end
                 else begin
-                    if(k == K+3) begin
+                    if(k == K+2) begin
                         state <= store_in_fifo;
                         k <= 0;
                     end
@@ -98,12 +109,26 @@ module MMM #(
                     if(n<N-1) begin
                         n <= n + 1;
                         clear_acc <= 1;
+                        
+                        //updated logic to make fsm faster
+                        A_read_addr <= m*K + k;
+                        B_read_addr <= n+1;
+                        k <= k+1;
+                        //changed logic ends here
+
                         state <= read_from_input_memory;
                     end
                     else if(m<M-1) begin
                         n <= 0;
                         m <= m + 1;
                         clear_acc <= 1;
+                        
+                        //updated logic to make fsm faster
+                        A_read_addr <= (m+1)*K;
+                        B_read_addr <= 0;
+                        k <= k+1;
+                        // changed logic ends here
+
                         state <= read_from_input_memory;
                     end
                     else begin
