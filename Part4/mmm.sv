@@ -84,10 +84,11 @@ module MMM #(
                     valid_input <= 0;
                 end
                 //changed logic ends here
-    
-                if(k==1) begin
+                
+                clear_acc <= 0; // CHANGE PREVIOUS logic is below 'commemted'
+                /*if(k==1) begin
                     clear_acc <= 0;
-                end
+                end*/
                 if(k<K) begin
                     A_read_addr <= m*K + k;
                     B_read_addr <= k*N + n;
@@ -96,7 +97,22 @@ module MMM #(
                 else begin
                     if(k == K+2) begin
                         state <= store_in_fifo;
-                        k <= 0;
+                        k <= 1;
+                        //clear_acc <= 1;
+                        ///
+                        if(n<N-1) begin
+                        //updated logic to make fsm faster
+                            A_read_addr <= m*K;
+                            B_read_addr <= n+1;
+                        //changed logic ends here
+                        end
+                        else if(m<M-1) begin
+                        //updated logic to make fsm faster
+                            A_read_addr <= (m+1)*K;
+                            B_read_addr <= 0;
+                        // changed logic ends here
+                        end
+                        ///
                     end
                     else begin
                         state <= read_from_input_memory;
@@ -109,12 +125,12 @@ module MMM #(
                     if(n<N-1) begin
                         n <= n + 1;
                         clear_acc <= 1;
-                        
                         //updated logic to make fsm faster
                         A_read_addr <= m*K + k;
-                        B_read_addr <= n+1;
+                        B_read_addr <= k*N + n + 1;
                         k <= k+1;
-                        //changed logic ends here
+                        valid_input <= 1;
+                        //changed logic ends here*/
 
                         state <= read_from_input_memory;
                     end
@@ -122,12 +138,13 @@ module MMM #(
                         n <= 0;
                         m <= m + 1;
                         clear_acc <= 1;
-                        
-                        //updated logic to make fsm faster
-                        A_read_addr <= (m+1)*K;
-                        B_read_addr <= 0;
                         k <= k+1;
-                        // changed logic ends here
+                        //updated logic to make fsm faster
+                        A_read_addr <= (m+1)*K + 1;
+                        B_read_addr <= N;
+                        k <= k+1;
+                        valid_input <= 1;
+                        // changed logic ends here*/
 
                         state <= read_from_input_memory;
                     end
