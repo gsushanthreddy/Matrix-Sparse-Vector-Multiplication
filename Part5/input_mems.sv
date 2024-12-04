@@ -337,7 +337,7 @@ module input_mems_datapath #(
     //instantiating Memory A
     memory #(.WIDTH(INW),.SIZE(M*MAXK)) inst_memory_A ( 
         .data_in(AXIS_TDATA),
-        .data_out(A_data_out),
+        .data_out(A_data), // changed to remove mux
         .addr(A_address),
         .clk(clk),
         .wr_en(wr_en_A)
@@ -346,13 +346,13 @@ module input_mems_datapath #(
     //instantiating Memory B
     memory #(.WIDTH(INW),.SIZE(MAXK*N)) inst_memory_B ( 
         .data_in(AXIS_TDATA),
-        .data_out(B_data_out),
+        .data_out(B_data), // changed to remove mux
         .addr(B_address),
         .clk(clk),
         .wr_en(wr_en_B)
     ); 
 
-    // MUX logic for A_data_out
+    /*// MUX logic for A_data_out
     always_comb begin
         if (matrices_loaded == 1) begin
             A_data = A_data_out;
@@ -370,7 +370,7 @@ module input_mems_datapath #(
         else begin
             B_data = 0;
         end
-    end
+    end*/
 
 endmodule
 

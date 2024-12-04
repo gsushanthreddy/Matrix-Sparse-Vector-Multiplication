@@ -17,11 +17,9 @@ module MMM #(
     input OUTPUT_TREADY
 );
     // logics for counting read address in control logic
-    logic [$clog2(M+1):0] m; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
-    logic [$clog2(N+1):0] n; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
-    logic [K_BITS:0] k; // same issue came akarsh hit critical case as part3 fix is increased a bit in length
-    logic clear_m, clear_n, clear_k;
-    logic increment_k, increment_m, increment_n;
+    logic [$clog2(M+1)-1:0] m;
+    logic [$clog2(N+1)-1:0] n;
+    logic [K_BITS:0] k; // made a change
     
     // logical connections between input_mems and mac_pipe
     logic signed [INW-1:0] A_data_from_input_mems;
@@ -46,7 +44,7 @@ module MMM #(
     logic [($clog2(N+1))-1:0] capacity;
 
     // initialising FSM
-    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state; //removed next state which is not required
+    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state;
   
     always_ff @(posedge clk) begin
         if(reset) begin
@@ -65,27 +63,59 @@ module MMM #(
                     compute_finished <= 0;
                     valid_input <= 0;
                     clear_acc <= 1;
+                    
+                    //updated logic to make fsm faster
+                    A_read_addr <= 0;
+                    B_read_addr <= 0;
+                    k <= k+1;
+                    // changed logic ends here
                 end
             end
-            else if(state == read_from_input_memory) begin
-                if(k==4) begin  // updated k==1 to k==4 as akarsh added 4 stage pipelined multilier
-                   valid_input <= 1; 
+            else if(state == read_from_input_memory) begin 
+                //updated logic to make fsm faster
+                if(k <= K+3) begin // for 4 stage designware of k should be valid for 3 more clock cycles
+                    if(k > 0) begin
+                        valid_input <= 1;
+                    end
                 end
-                else if(k == K+4) begin // updated k==K+1 to k==K+4 as akarsh added 4 stage pipelined multilier
+                else begin
                     valid_input <= 0;
                 end
-                if(k==5) begin     // updated k==2 to k==5 as akarsh added 4 stage pipelined multilier
+                //changed logic ends here
+                
+                if(k==5) begin // for 4 stage designware after clear hould toggle after when K = stages+1
                     clear_acc <= 0;
                 end
+                
+                /*clear_acc <= 0; // CHANGE PREVIOUS logic is below 'commemted'
+                /*if(k==1) begin
+                    clear_acc <= 0;
+                end*/
+
                 if(k<K) begin
                     A_read_addr <= m*K + k;
                     B_read_addr <= k*N + n;
                     k <= k+1;
                 end
                 else begin
-                    if(k == K+6) begin // updated k==K+3 to k==K+6 as akarsh added 4 stage pipelined multilier
+                    if(k == K+5) begin // change for designware of 4 stage so changed from  k== K+2 to k = K+5
                         state <= store_in_fifo;
-                        k <= 0;
+                        k <= 1;
+                        //clear_acc <= 1;
+                        ///
+                        if(n<N-1) begin
+                        //updated logic to make fsm faster
+                            A_read_addr <= m*K;
+                            B_read_addr <= n+1;
+                        //changed logic ends here
+                        end
+                        else if(m<M-1) begin
+                        //updated logic to make fsm faster
+                            A_read_addr <= (m+1)*K;
+                            B_read_addr <= 0;
+                        // changed logic ends here
+                        end
+                        ///
                     end
                     else begin
                         state <= read_from_input_memory;
@@ -98,12 +128,27 @@ module MMM #(
                     if(n<N-1) begin
                         n <= n + 1;
                         clear_acc <= 1;
+                        //updated logic to make fsm faster
+                        A_read_addr <= m*K + k;
+                        B_read_addr <= k*N + n + 1;
+                        k <= k+1;
+                        valid_input <= 1;
+                        //changed logic ends here*/
+
                         state <= read_from_input_memory;
                     end
                     else if(m<M-1) begin
                         n <= 0;
                         m <= m + 1;
                         clear_acc <= 1;
+                        k <= k+1;
+                        //updated logic to make fsm faster
+                        A_read_addr <= (m+1)*K + 1;
+                        B_read_addr <= N;
+                        k <= k+1;
+                        valid_input <= 1;
+                        // changed logic ends here*/
+
                         state <= read_from_input_memory;
                     end
                     else begin
