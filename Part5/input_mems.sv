@@ -100,7 +100,7 @@ module input_mems_fsm #(
         if(reset==1) begin
             wr_en_a = 0;
             wr_en_b = 0;
-            matrices_loaded = 0;
+            //matrices_loaded = 0;
             AXIS_TREADY = 1;
             next_state = start;
         end
@@ -111,20 +111,20 @@ module input_mems_fsm #(
                     if(new_A == 1) begin
                         wr_en_a = 1;
                         wr_en_b = 0;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_a;
                     end
                     else if(new_A == 0) begin
                         wr_en_a = 0;
                         wr_en_b = 1;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_b;
                     end
                 end
                 else begin
                     wr_en_a = 0;
                     wr_en_b = 0;
-                    matrices_loaded = 0;
+                    //matrices_loaded = 0;
                     next_state = start;
                 end
             end
@@ -133,7 +133,7 @@ module input_mems_fsm #(
                 if(matrix_A_loaded == 1) begin
                     wr_en_a = 0;
                     wr_en_b = 0;
-                    matrices_loaded = 0;
+                    //matrices_loaded = 0;
                     next_state = load_b;
                     AXIS_TREADY = 0;
                 end
@@ -141,13 +141,13 @@ module input_mems_fsm #(
                     if(AXIS_TVALID) begin
                         wr_en_a = 1;
                         wr_en_b = 0;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_a;
                     end
                     else begin
                         wr_en_a = 0;
                         wr_en_b = 0;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_a;
                     end
                 end
@@ -157,7 +157,7 @@ module input_mems_fsm #(
                 if(matrix_B_loaded == 1) begin
                     wr_en_a = 0;
                     wr_en_b = 0;
-                    matrices_loaded = 1;
+                    //matrices_loaded = 1;
                     AXIS_TREADY = 0;
                     next_state = read;
                 end
@@ -165,13 +165,13 @@ module input_mems_fsm #(
                     if(AXIS_TVALID) begin
                         wr_en_a = 0;
                         wr_en_b = 1;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_b;
                     end
                     else begin
                         wr_en_a = 0;
                         wr_en_b = 0;
-                        matrices_loaded = 0;
+                        //matrices_loaded = 0;
                         next_state = load_b;
                     end
                 end
@@ -181,13 +181,13 @@ module input_mems_fsm #(
                 if(compute_finished == 0) begin
                     wr_en_a = 0;
                     wr_en_b = 0;
-                    matrices_loaded = 1;
+                    //matrices_loaded = 1;
                     next_state = read;
                 end
                 else if(compute_finished == 1) begin
                     wr_en_a = 0;
                     wr_en_b = 0;
-                    matrices_loaded = 0;
+                    //matrices_loaded = 0;
                     next_state = start;
                 end
             end
@@ -206,6 +206,23 @@ module input_mems_fsm #(
     always_ff @(posedge clk) begin
         if(AXIS_TVALID && AXIS_TREADY && new_A && state == start) begin
             K <= TUSER_K;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if(reset) begin
+            matrices_loaded <= 0;
+        end
+        else if ((state == load_b) && (matrix_B_loaded == 1)) begin
+            matrices_loaded <= 1;
+        end
+        else if (state == read) begin
+            if (compute_finished == 0) begin
+                matrices_loaded <= 1;
+            end 
+            else if (compute_finished == 1) begin
+                matrices_loaded <= 0;
+            end     
         end
     end
 
@@ -337,7 +354,7 @@ module input_mems_datapath #(
     //instantiating Memory A
     memory #(.WIDTH(INW),.SIZE(M*MAXK)) inst_memory_A ( 
         .data_in(AXIS_TDATA),
-        .data_out(A_data), // changed to remove mux
+        .data_out(A_data),
         .addr(A_address),
         .clk(clk),
         .wr_en(wr_en_A)
@@ -346,13 +363,14 @@ module input_mems_datapath #(
     //instantiating Memory B
     memory #(.WIDTH(INW),.SIZE(MAXK*N)) inst_memory_B ( 
         .data_in(AXIS_TDATA),
-        .data_out(B_data), // changed to remove mux
+        .data_out(B_data),
         .addr(B_address),
         .clk(clk),
         .wr_en(wr_en_B)
     ); 
-
-    /*// MUX logic for A_data_out
+    
+    /*
+    // MUX logic for A_data_out
     always_comb begin
         if (matrices_loaded == 1) begin
             A_data = A_data_out;
@@ -370,7 +388,8 @@ module input_mems_datapath #(
         else begin
             B_data = 0;
         end
-    end*/
+    end
+    */
 
 endmodule
 

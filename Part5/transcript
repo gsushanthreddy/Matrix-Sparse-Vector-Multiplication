@@ -1,0 +1,53 @@
+# vsim -64 -sv_seed random -c MMM_tb -do "run -all; quit" 
+# Start time: 23:05:58 on Dec 09,2024
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
+# ** Note: (vopt-143) Recognized 1 FSM in module "MMM(fast)".
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=1.
+# //  Questa Sim-64
+# //  Version 2023.4_3 linux_x86_64 Feb 17 2024
+# //
+# //  Copyright 1991-2024 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.MMM_tb_sv_unit(fast)
+# Loading work.MMM_tb(fast)
+# Loading work.MMM(fast)
+# Loading work.input_mems(fast)
+# Loading work.input_mems_fsm(fast)
+# Loading work.input_mems_datapath(fast)
+# Loading work.memory(fast)
+# Loading work.mac_pipe(fast)
+# Loading work.DW02_mult_2_stage(fast)
+# Loading work.fifo_out(fast)
+# Loading work.head_block(fast)
+# Loading work.tail_block(fast)
+# Loading work.capacity_block(fast)
+# Loading work.memory_dual_port(fast)
+# Loading /tmp/sgokavarapu@lab23.ece.stonybrook.edu_dpi_2369689/linux_x86_64_gcc-10.3.0/vsim_auto_compile.so
+# Sv_Seed = 106163289
+# run -all
+# --------------------------------------------------------
+# Starting top-level simulation:       10000 tests
+# M x N:          16 x          16
+# MAXK:            7
+# Input          12 bits
+# Output:          36 bits
+# INPUT_TVALID_PROB = 0.792
+# OUTPUT_TREADY_PROB = 0.870
+# --------------------------------------------------------
+# Simulated       10000 tests, with a total of     2560000 output values. Detected           0 errors.
+# Your system computed       10000 MMMs in    20531895 cycles --> 4.870471e-04 MMMs per cycle
+# ** Note: $finish    : MMM_tb.sv(347)
+#    Time: 205318976 ns  Iteration: 0  Instance: /MMM_tb
+# End time: 23:06:31 on Dec 09,2024, Elapsed time: 0:00:33
+# Errors: 0, Warnings: 1

@@ -45,6 +45,27 @@ module MMM #(
 
     // initialising FSM
     enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state;
+
+    always_comb begin
+        if (reset) begin
+            compute_finished = 1;
+        end 
+        else begin
+            if (state == mmm_start) begin
+                if (matrices_loaded == 1) begin
+                    compute_finished = 0;
+                end
+            end 
+            else if (state == store_in_fifo) begin
+                if((n == N-1) && (m == M-1)) begin 
+                    compute_finished = 1;
+                end
+            else begin
+                compute_finished = 0;
+            end
+            end
+        end
+    end
   
     always_ff @(posedge clk) begin
         if(reset) begin
@@ -52,7 +73,7 @@ module MMM #(
             k <= 0;
             m <= 0;
             n <= 0;
-            compute_finished <= 1;
+            //compute_finished <= 1;
             valid_input <= 0;
             clear_acc <= 1;
         end
@@ -60,7 +81,7 @@ module MMM #(
             if(state == mmm_start) begin
                 if(matrices_loaded == 1) begin
                     state <= read_from_input_memory;
-                    compute_finished <= 0;
+                    //compute_finished <= 0;
                     valid_input <= 0;
                     clear_acc <= 1;
                     
@@ -73,7 +94,7 @@ module MMM #(
             end
             else if(state == read_from_input_memory) begin 
                 //updated logic to make fsm faster
-                if(k <= K+3) begin // for 4 stage designware of k should be valid for 3 more clock cycles
+                if(k <= K+1) begin // for 4 stage designware of k should be valid for 3 more clock cycles
                     if(k > 0) begin
                         valid_input <= 1;
                     end
@@ -83,22 +104,20 @@ module MMM #(
                 end
                 //changed logic ends here
                 
-                if(k==5) begin // for 4 stage designware after clear hould toggle after when K = stages+1
+                if(k==3) begin // for 4 stage designware after clear hould toggle after when K = stages+1
                     clear_acc <= 0;
                 end
-                
-                /*clear_acc <= 0; // CHANGE PREVIOUS logic is below 'commemted'
+                //clear_acc <= 0; // CHANGE PREVIOUS logic is below 'commemted'
                 /*if(k==1) begin
                     clear_acc <= 0;
                 end*/
-
                 if(k<K) begin
                     A_read_addr <= m*K + k;
                     B_read_addr <= k*N + n;
                     k <= k+1;
                 end
                 else begin
-                    if(k == K+5) begin // change for designware of 4 stage so changed from  k== K+2 to k = K+5
+                    if(k == K+3) begin // change for designware of 4 stage so changed from  k== K+2 to k = K+5
                         state <= store_in_fifo;
                         k <= 1;
                         //clear_acc <= 1;
@@ -156,7 +175,7 @@ module MMM #(
                         m <= 0;
                         n <= 0;
                         k <= 0;
-                        compute_finished <= 1;
+                        //compute_finished <= 1;
                     end
                 end
             end

@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+
+# script to generate the params.sv file based on the command line parameters
+# usage: ./genParams3 [INW] [OUTW] [M] [N] [MAXK] [TVALID_PROB] [TREADY_PROB]
+#    where you will replace [*] with the desired value of those parameters.
+#    Remember that if TVALID_PROB/TREADY_PROB = 0, the testbench will randomize it.
+
+# example: for INW=12, OUTW=32, M=5, N=4, MAXK=5 with random TREADY/TVALID 
+# probabilities, run: 
+#       ./genParams4 12 32 5 4 5 0 0 
+
+if [ $# -ne 7 ]; then
+    echo "ERROR: incorrect number of parameters given."
+    echo "Usage: ./genParams3 [INW] [OUTW] [M] [N] [MAXK] [TVALID_PROB] [TREADY_PROB]"
+    echo "See comments in genParams4 file for more information"
+else
+    echo "\`define INWVAL $1" > params.sv
+    echo "\`define OUTWVAL $2" >> params.sv
+    echo "\`define MVAL $3" >> params.sv
+    echo "\`define NVAL $4" >> params.sv
+    echo "\`define MAXKVAL $5" >> params.sv
+    echo "\`define TVPR $( sed 's/^[.]/0./' <<< "$6" )" >> params.sv
+    echo "\`define TRPR $( sed 's/^[.]/0./' <<< "$7" )" >> params.sv
+fi

@@ -1,7 +1,7 @@
-`define INWVAL 24
-`define OUTWVAL 64
-`define MVAL 17
-`define NVAL 15
-`define MAXKVAL 20
+`define INWVAL 12
+`define OUTWVAL 36
+`define MVAL 16
+`define NVAL 16
+`define MAXKVAL 7
 `define TVPR 0
 `define TRPR 0

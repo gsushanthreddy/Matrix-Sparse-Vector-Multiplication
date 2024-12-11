@@ -24,7 +24,7 @@ module mac_pipe #(
     end*/
     
     // instantiating design ware multiplier for pipeling
-    DW02_mult_4_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, mult_out);
+    DW02_mult_2_stage #(INW, INW) multinstance(in0, in1, 1'b1, clk, mult_out);
 
     always_ff @(posedge clk) begin
         if(reset) begin

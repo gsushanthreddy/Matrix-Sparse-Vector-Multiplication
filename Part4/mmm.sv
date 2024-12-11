@@ -20,8 +20,6 @@ module MMM #(
     logic [$clog2(M+1)-1:0] m;
     logic [$clog2(N+1)-1:0] n;
     logic [K_BITS:0] k; // made a change
-    logic clear_m, clear_n, clear_k;
-    logic increment_k, increment_m, increment_n;
     
     // logical connections between input_mems and mac_pipe
     logic signed [INW-1:0] A_data_from_input_mems;
@@ -46,7 +44,7 @@ module MMM #(
     logic [($clog2(N+1))-1:0] capacity;
 
     // initialising FSM
-    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state, next_state;
+    enum logic [1:0] {mmm_start, read_from_input_memory, store_in_fifo} state;
   
     always_ff @(posedge clk) begin
         if(reset) begin
